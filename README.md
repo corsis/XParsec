@@ -4,12 +4,12 @@
 open XParsec.Combinators
 open XParsec.Xml
 
-let xs = AE.New [| X.Parse "<span font='Bold' />"; X.Parse "<span s='(' />" |]
-let r  = next >. !@"font"|->String.length .> "font"@~?"B" .>. next .> !@+"s" <| xs
+let s=AE.New [| X.Parse "<span font='Bold' />"; X.Parse "<span t='(' />" |]
+let r=next >. !@"font"|->String.length .> "font"@~?"B" .>. next .> !@+"t" <| s
 ```
 
 ```
-val reply : (int * X) Reply = S (4, <span s="(" />)
+val r : (int * X) Reply = S (4, <span t="(" />)
 ```
 
 # Browse
