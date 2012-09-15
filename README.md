@@ -5,7 +5,13 @@ A stream-type-independent parsec implementation in F# 3.0.
 
 ---
 
-# Example
+# Example 1
+
+```
+next .> "font­" @~? "Bold­" .>. next .> !@+ "s" <| AE.Ne­w [| X.Par­se "<span font=­'Bold' />"; X.Par­se "<span s='('­ />" |];;
+```
+
+# Example 2
 
 ```
 let e  = X.Parse "<span bbox=\"152.16 584.626 246.826 595.656\"  font=\"TimesNewRoman\"      size=\"9.96\" s=\" \" />"
