@@ -1,10 +1,3 @@
-XParsec
-=======
-
-A stream-type-independent parsec implementation in F# 3.0 - inspired by FParsec, freed from CharStreams and simplified.
-
----
-
 # Example
 
 ```
@@ -19,9 +12,7 @@ let reply  = next >. !@"font" |-> String.length .> "font" @~? "B" .>. next .> !@
 val reply : (int * X) Reply = S (4, <span s="(" />)
 ```
 
-----
-
-## Contact
+---
 
 [![corsis]](https://github.com/corsis/)
 
