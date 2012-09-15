@@ -7,7 +7,7 @@ A stream-type-independent parsec implementation in F#
 
 # Example
 
-```f#
+```
 let e  = X.Parse "<span bbox=\"152.16 584.626 246.826 595.656\"  font=\"TimesNewRoman\"      size=\"9.96\" s=\" \" />"
 let x  = X.Parse "<span bbox=\"63.2999 584.626 152.105 595.656\" font=\"TimesNewRoman,Bold\" size=\"9.96\" s=\"Sahra Wagenknecht \" />"
 let y  = X.Parse "<span bbox=\"152.16 584.626 246.826 595.656\"  font=\"TimesNewRoman\"      size=\"9.96\" s=\"(DIE LINKE)  . . . . . . .\" />"
@@ -16,7 +16,7 @@ let z2 = X.Parse "<span bbox=\"152.16 584.626 246.826 595.656\"  font=\"TimesNew
 
 ```
 
-```f#
+```
 open XParsec
 open XParsec.Streams
 open XParsec.Combinators
@@ -25,14 +25,14 @@ open XParsec.Xml
 type XP<'b> = Parser<X,'b>
 
 
-let empty : _ XP = next .> !@~ "s"
-let inline (.->.)  p q = p .> !* empty .>. q
-
 let inline left x = (s:string).Split [| ' ' |] |> Seq.head |> float
 
+let empty : _ XP      = next .> !@~ "s"
+let inline (.->.) p q = p .> !* empty .>. q
 
-let o, c = "s" @~? "(", "s" @~? ")"
 
+let o       : _ XP = "s" @~? "("
+let c       : _ XP = "s" @~? ")"
 let name    : _ XP = next .>. ( "font" @~? "Bold" >. !@"bbox" |-> left .> !@+"s" )
 let party t : _ XP = next .>. ( "font" @~! "Bold" >. !@"bbox" |-> left .> t      )
 
