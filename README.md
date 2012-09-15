@@ -12,7 +12,12 @@ let reply  = next >. !@"font" |-> String.length .> "font" @~? "B" .>. next .> !@
 val reply : (int * X) Reply = S (4, <span s="(" />)
 ```
 
----
+# Browse
+
++ [Signatures](https://github.com/corsis/XParsec/blob/master/XParsec.fsi)
++ [Implementation](https://github.com/corsis/XParsec/blob/master/XParsec.fs)
+
+## Contact
 
 [![corsis]](https://github.com/corsis/)
 
