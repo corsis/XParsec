@@ -1,15 +1,15 @@
 # Example
 
 ```
-open XParsec.Combinators
+open XParsec
 open XParsec.Xml
 
-let s = AE.New [| X.Parse "<span font='Bold' />"; X.Parse "<span t='(' />" |]
+let s = AE.New [| E.Parse "<span font='Bold' />"; E.Parse "<span t='(' />" |]
 let r = next >. !@"font"|->String.length .> "font"@~?"B" .>. next .> !@+"t" <| s
 ```
 
 ```
-val r : (int * X) Reply = S (4, <span t="(" />)
+val r : (int * E) Reply = S (4, <span t="(" />)
 ```
 
 # Browse
