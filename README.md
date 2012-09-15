@@ -1,7 +1,7 @@
 XParsec
 =======
 
-A stream-type-independent parsec implementation in F# 3.0.
+A stream-type-independent parsec implementation in F# 3.0 - inspired by FParsec, freed from CharStreams and simplified.
 
 ---
 
