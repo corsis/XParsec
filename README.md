@@ -5,7 +5,7 @@ A stream-type-independent parsec implementation in F# 3.0.
 
 ---
 
-# Example 1
+# Example
 
 ```
 open XParsec.Combinators
