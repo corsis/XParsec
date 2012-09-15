@@ -5,7 +5,7 @@ open XParsec.Combinators
 open XParsec.Xml
 
 let xs = AE.New [| X.Parse "<span font='Bold' />"; X.Parse "<span s='(' />" |]
-let r  = next >. !@"font" |-> String.length .> "font" @~? "B" .>. next .> !@+ "s" <| xs
+let r  = next >. !@"font"|->String.length .> "font"@~?"B" .>. next .> !@+"s" <| xs
 ```
 
 ```
