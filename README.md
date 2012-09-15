@@ -11,7 +11,7 @@ A stream-type-independent parsec implementation in F# 3.0.
 open XParsec.Combinators
 open XParsec.Xml
 
-let r = next­ >. !@"fo­nt" |-> Strin­g.length .> "font­" @~? "Bold­" .>. next .> !@+ "s" <| AE.Ne­w [| X.Par­se "<span font=­'Bold' />"; X.Par­se "<span s='('­ />" |];;
+let r = next­ >. !@"fo­nt" |-> Strin­g.length .> "font­" @~? "B­" .>. next .> !@+ "s" <| AE.Ne­w [| X.Par­se "<span font=­'Bold' />"; X.Par­se "<span s='('­ />" |];;
 ```
 
 ```
