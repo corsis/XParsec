@@ -6,6 +6,7 @@ module XParsec
 open   System
 
 
+  [<AutoOpen>]
   module Streams =
 
     open System.Collections
@@ -45,6 +46,7 @@ open   System
   type      P<'a,'b> = 'a S      -> 'b R
 
 
+  [<AutoOpen>]
   module Combinators =
 
     val inline Δ<'a>   :               'a
@@ -81,23 +83,26 @@ open   System
 
   module Xml =
 
-    type X = System.Xml.Linq.XElement
+    type E = System.Xml.Linq.XElement
+    type A = string // Attribute Name
 
+    [<AutoOpen>]
     module Operators =
-
       val inline ( !> )  :  ^b -> ^a when ^a : (static member op_Implicit : ^b -> ^a)
-      val inline ( ~~ )  :      string ->           bool
-      val inline ( -!- ) :      string -> string -> bool
-      val inline ( -?- ) :      string -> string -> bool
+      val inline ( ~~ )  : string ->           bool
+      val inline ( -!- ) : string -> string -> bool
+      val inline ( -?- ) : string -> string -> bool
 
-      val inline ( @ )   : X -> string -> string
-      val inline ( @? )  : X -> string -> string -> bool
-      val inline ( @! )  : X -> string -> string -> bool
-      val inline ( @< )  : X -> string -> 'a     -> unit
-      val inline ( @~ )  : X -> string ->           bool
+      val inline ( @  )  : E -> A -> string
+      val inline ( @< )  : E -> A -> 'a     -> unit
+      val inline ( @? )  : E -> A -> string -> bool
+      val inline ( @! )  : E -> A -> string -> bool
+      val inline ( @~ )  : E -> A ->           bool
 
-    val inline ( !@   ) : string ->           Parser<X,string>
-    val inline ( !@~  ) : string ->           Parser<X,unit>
-    val inline ( !@+  ) : string ->           Parser<X,unit>
-    val inline (  @~? ) : string -> string -> Parser<X,unit>
-    val inline (  @~! ) : string -> string -> Parser<X,unit>
+    [<AutoOpen>]
+    module Parsers =
+      val inline ( !@   )  :    A ->           Parser<E,string>
+      val inline ( !@~  )  :    A ->           Parser<E,unit>
+      val inline ( !@+  )  :    A ->           Parser<E,unit>
+      val inline (  @~? )  :    A -> string -> Parser<E,unit>
+      val inline (  @~! )  :    A -> string -> Parser<E,unit>

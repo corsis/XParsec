@@ -100,7 +100,8 @@ module Combinators =
 
 module Xml =
 
-  type X = System.Xml.Linq.XElement
+  type E = System.Xml.Linq.XElement
+  type A = string // Attribute Name
 
   module Operators =
 
@@ -109,16 +110,18 @@ module Xml =
     let inline (-!-) a b = (a : string).Contains b |> not
     let inline (-?-) a b = (a : string).Contains b
 
-    let inline (@)  (x:X) a   = let a = x.Attribute(!> a) in if a <> null then a.Value else String.Empty
-    let inline (@<) (x:X) a v = x.SetAttributeValue(!> a, v)
-    let inline (@~)  x    a   = ~~(x @ a)
-    let inline (@?)  x    a v =   (x @ a) -?- v
-    let inline (@!)  x    a v =   (x @ a) -!- v
+    let inline (@ ) (e:E) a   = let a = e.Attribute(!> a) in if a <> null then a.Value else String.Empty
+    let inline (@<) (e:E) a v = e.SetAttributeValue(!> a, v)
+    let inline (@?)  e    a v =   (e @ a) -?- v
+    let inline (@!)  e    a v =   (e @ a) -!- v
+    let inline (@~)  e    a   = ~~(e @ a)
 
-  open Operators
+  module Parsers =
 
-  let inline (!@)   a   (e : X S) = let x = e.Current.Attribute(!> a) in if x <> null then S x.Value else F
-  let inline (!@~)  a   (e : X S) = (e.Current @~ a       ) |> Reply<_>.FromBool
-  let inline (!@+)  a   (e : X S) = (e.Current @~ a |> not) |> Reply<_>.FromBool
-  let inline ( @~?) a v (e : X S) = (e.Current @? a <| v)   |> Reply<_>.FromBool
-  let inline ( @~!) a v (e : X S) = (e.Current @! a <| v)   |> Reply<_>.FromBool
+    open Operators
+
+    let inline ( !@   ) a   (s : E S) = let x = s.Current.Attribute(!> a) in if x <> null then S x.Value else F
+    let inline ( !@~  ) a   (s : E S) = (s.Current @~ a       ) |> Reply<_>.FromBool
+    let inline ( !@+  ) a   (s : E S) = (s.Current @~ a |> not) |> Reply<_>.FromBool
+    let inline (  @~? ) a v (s : E S) = (s.Current @? a <| v)   |> Reply<_>.FromBool
+    let inline (  @~! ) a v (s : E S) = (s.Current @! a <| v)   |> Reply<_>.FromBool
