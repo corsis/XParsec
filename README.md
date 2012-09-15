@@ -53,3 +53,13 @@ let s = ArrayEnumerator.New [|x;e;e;z1;z2|] in printfn "%A" (s |> speaker, s.Sta
     <span bbox="152.16 584.626 246.826 595.656" font="TimesNewRoman" size="9.96" s="LINKE)  . . . . . . ." />],
  4)
 ```
+
+----
+
+## Contact
+
+[![corsis]](https://github.com/corsis/)
+
+[fusion@corsis.eu](mailto:fusion@corsis.eu)
+
+[corsis]: http://portfusion.sourceforge.net/i/l100.png "Corsis Research"
