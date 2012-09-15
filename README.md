@@ -17,8 +17,21 @@ let z2 = X.Parse "<span bbox=\"152.16 584.626 246.826 595.656\"  font=\"TimesNew
 ```
 
 ```f#
-let o = "s" @~? "("
-let c = "s" @~? ")"
+open XParsec
+open XParsec.Streams
+open XParsec.Combinators
+open XParsec.Xml
+
+type XP<'b> = Parser<X,'b>
+
+
+let empty : _ XP = next .> !@~ "s"
+let inline (.->.)  p q = p .> !* empty .>. q
+
+let inline left x = (s:string).Split [| ' ' |] |> Seq.head |> float
+
+
+let o, c = "s" @~? "(", "s" @~? ")"
 
 let name    : _ XP = next .>. ( "font" @~? "Bold" >. !@"bbox" |-> left .> !@+"s" )
 let party t : _ XP = next .>. ( "font" @~! "Bold" >. !@"bbox" |-> left .> t      )
@@ -26,19 +39,17 @@ let party t : _ XP = next .>. ( "font" @~! "Bold" >. !@"bbox" |-> left .> t     
 let sp2 : _ XP = name .->. party (o .> c)       |?> function  (x1,l1), (x2,l2)           -> (l1 < l2)            ?-> [x1; x2]
 let sp3 : _ XP = name .->. party o .->. party c |?> function ((x1,l1), (x2,l2)), (x3,l3) -> (l1 < l2 && l1 < l3) ?-> [x1; x2; x3]
 
+let speaker : _ XP = (attempt sp2) </> sp3
 
-let ms xs = xs |> Seq.toArray |> ArrayEnumerator.New
 
-let g = [x;e;e;z1;z2]  
-let s = ms g in (s |> (name >. !@ "s" .> skipN 2 empty .>. party o .>. many empty .>. party c), s.State) |> printfn "%A"
+let s = ArrayEnumerator.New [|x;e;e;z1;z2|] in printfn "%A" (s |> speaker, s.State)
 ```
 
 ---
 
 ```
-(S ((("Sahra Wagenknecht ",
-      (<span bbox="152.16 584.626 246.826 595.656" font="TimesNewRoman" size="9.96" s="(DIE" />,
-       152.16)), []),
-    (<span bbox="152.16 584.626 246.826 595.656" font="TimesNewRoman" size="9.96" s="LINKE)  . . . . . . ." />,
-     152.16)), 4)
+(S [<span bbox="63.2999 584.626 152.105 595.656" font="TimesNewRoman,Bold" size="9.96" s="Sahra Wagenknecht " />;
+    <span bbox="152.16 584.626 246.826 595.656" font="TimesNewRoman" size="9.96" s="(DIE" />;
+    <span bbox="152.16 584.626 246.826 595.656" font="TimesNewRoman" size="9.96" s="LINKE)  . . . . . . ." />],
+ 4)
 ```
