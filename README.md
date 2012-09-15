@@ -11,11 +11,11 @@ A stream-type-independent parsec implementation in F# 3.0.
 open XParsec.Combinators
 open XParsec.Xml
 
-let r = next >. !@"fo­nt" .> "font­" @~? "Bold­" .>. next .> !@+ "s" <| AE.Ne­w [| X.Par­se "<span font=­'Bold' />"; X.Par­se "<span s='('­ />" |];;
+let r = next­ >. !@"fo­nt" |-> Strin­g.length .> "font­" @~? "Bold­" .>. next .> !@+ "s" <| AE.Ne­w [| X.Par­se "<span font=­'Bold' />"; X.Par­se "<span s='('­ />" |];;
 ```
 
 ```
-val r : (string * X) Reply = S (<span font="Bold" />, <span s="(" />)
+val r : (int * X) Reply = S (4, <span s="(" />)
 ```
 
 ----
