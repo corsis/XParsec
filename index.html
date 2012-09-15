@@ -28,11 +28,7 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h1>XParsec</h1>
-
-<p>A stream-type-independent parsec implementation in F# 3.0 - inspired by FParsec, freed from CharStreams and simplified.</p>
-
-<hr><h1>Example</h1>
+          <h1>Example</h1>
 
 <pre><code>open XParsec.Combinators
 open XParsec.Xml
@@ -44,11 +40,7 @@ let reply  = next &gt;. !@"font" |-&gt; String.length .&gt; "font" @~? "B" .&gt;
 <pre><code>val reply : (int * X) Reply = S (4, &lt;span s="(" /&gt;)
 </code></pre>
 
-<hr><h2>Contact</h2>
-
-<p><a href="https://github.com/corsis/"><img src="http://portfusion.sourceforge.net/i/l100.png" alt="corsis" title="Corsis Research"></a></p>
-
-<p><a href="mailto:fusion@corsis.eu">fusion@corsis.eu</a></p>
+<hr><p><a href="https://github.com/corsis/"><img src="http://portfusion.sourceforge.net/i/l100.png" alt="corsis" title="Corsis Research"></a></p>
         </section>
 
         <aside id="sidebar">
