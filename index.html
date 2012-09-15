@@ -33,14 +33,21 @@
 <pre><code>open XParsec.Combinators
 open XParsec.Xml
 
-let stream = AE.New [| X.Parse "&lt;span font='Bold' /&gt;"; X.Parse "&lt;span s='(' /&gt;" |]
-let reply  = next &gt;. !@"font" |-&gt; String.length .&gt; "font" @~? "B" .&gt;. next .&gt; !@+ "s" &lt;| stream
+let s = AE.New [| X.Parse "&lt;span font='Bold' /&gt;"; X.Parse "&lt;span t='(' /&gt;" |]
+let r = next &gt;. !@"font"|-&gt;String.length .&gt; "font"@~?"B" .&gt;. next .&gt; !@+"t" &lt;| s
 </code></pre>
 
-<pre><code>val reply : (int * X) Reply = S (4, &lt;span s="(" /&gt;)
+<pre><code>val r : (int * X) Reply = S (4, &lt;span t="(" /&gt;)
 </code></pre>
 
-<hr><p><a href="https://github.com/corsis/"><img src="http://portfusion.sourceforge.net/i/l100.png" alt="corsis" title="Corsis Research"></a></p>
+<h1>Browse</h1>
+
+<ul>
+<li><a href="https://github.com/corsis/XParsec/blob/master/XParsec.fsi">Signatures</a></li>
+<li><a href="https://github.com/corsis/XParsec/blob/master/XParsec.fs">Implementation</a></li>
+</ul><h2>Contact</h2>
+
+<p><a href="https://github.com/corsis/"><img src="http://portfusion.sourceforge.net/i/l100.png" alt="corsis" title="Corsis Research"></a></p>
         </section>
 
         <aside id="sidebar">
