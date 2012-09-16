@@ -2,10 +2,9 @@
 
 (FParsec only works with `Char`s and can only go forward on a one dimensional string.)
 
-
 # Example
 
-Here we use our first source provider [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/16de327b98410e3031636ffa86572e12d52f4594/XParsec.fsi#L80) – the first XParsec extension [implemented in just 19 lines of F#](https://github.com/corsis/XParsec/blob/16de327b98410e3031636ffa86572e12d52f4594/XParsec.fs#L103).
+Below we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/c07865bcebfdaeb6eeb008804aaf33c4dbb400c8/XParsec.fsi#L61) – the first XParsec extension [implemented in just 19 lines of F#](https://github.com/corsis/XParsec/blob/c07865bcebfdaeb6eeb008804aaf33c4dbb400c8/XParsec.fs#L102).
 
 ```fsharp
   open XParsec
@@ -13,7 +12,9 @@ Here we use our first source provider [`XParsec.Xml`](https://github.com/corsis/
 
   let show x          = printfn "%A" x
   let test root parse = root |> enter |> parse |> show
-  let name (e : E)    = string e.Name // easy to extend
+  let name (e : E)    = string e.Name
+  //            ^
+  //           XElement
 
   let root1 = E.Parse "<root><a><b><c><d font='Arial'></d></c></b></a></root>"
 
@@ -32,7 +33,6 @@ Here we use our first source provider [`XParsec.Xml`](https://github.com/corsis/
 
   test root1 parser1; test root1 parser2; test root1 parser3
 ```
-
 ```fsharp
 (S (["a"; "b"; "c"; "d"], "Arial"), XParsec+Source`2[XElement,XElement])
 (S "Arial", XParsec+Source`2[XElement,XElement])
