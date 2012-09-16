@@ -2,7 +2,7 @@
 
 ```
   open XParsec
-  open XParsec.Xml // just one source provider, you can implement your own!
+  open XParsec.Xml    // just one source provider, you can implement your own!
 
   let show x          = printfn "%A" x
   let test root parse = root |> enter |> parse |> show
