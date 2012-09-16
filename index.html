@@ -20,7 +20,7 @@
     <header>
       <div class="inner">
         <h1>XParsec</h1>
-        <h2>A stream-type-independent parsec implementation in F# 3.0 - inspired by FParsec, freed from CharStreams and simplified.</h2>
+        <h2>A stream-and-type-independent non-linear parsec implementation in F# 3.0 - inspired by FParsec, freed from Chars and linear Streams and simplified.</h2>
         <a href="https://github.com/corsis/XParsec" class="button"><small>View project on</small>GitHub</a>
       </div>
     </header>
@@ -28,16 +28,45 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h1>Example</h1>
+          <p><strong>XParsec</strong> can work with <strong>any type</strong>, supports <strong><a href="https://github.com/corsis/XParsec/blob/16de327b98410e3031636ffa86572e12d52f4594/XParsec.fsi#L88">domain-specific non-linear navigation</a></strong> and is <a href="https://github.com/corsis/XParsec/blob/f6bc93499a588b287dc20f622fb917e1edac58b8/XParsec.fs#L111"><strong>very easy to extend</strong></a>.</p>
 
-<pre><code>open XParsec
-open XParsec.Xml
+<p>(FParsec only works with <code>Char</code>s and can only go forward on a one dimensional string.)</p>
 
-let s = AE.New [| E.Parse "&lt;span font='Bold' /&gt;"; E.Parse "&lt;span t='(' /&gt;" |]
-let r = next &gt;. !@"font"|-&gt;String.length .&gt; "font"@~?"B" .&gt;. next .&gt; !@+"t" &lt;| s
+<h1>Example</h1>
+
+<p>Here we use our first source provider <a href="https://github.com/corsis/XParsec/blob/16de327b98410e3031636ffa86572e12d52f4594/XParsec.fsi#L80"><code>XParsec.Xml</code></a> – the first XParsec extension <a href="https://github.com/corsis/XParsec/blob/16de327b98410e3031636ffa86572e12d52f4594/XParsec.fs#L103">implemented in just 19 lines of F#</a>.</p>
+
+<pre><code>  open XParsec
+  open XParsec.Xml
+
+  let show x          = printfn "%A" x
+  let test root parse = root |&gt; enter |&gt; parse |&gt; show
+  let name (e : E)    = string e.Name // easy to extend
+
+  //
+
+  let root1 = E.Parse "&lt;root&gt;&lt;a&gt;&lt;b&gt;&lt;c&gt;&lt;d font='Arial'&gt;&lt;/d&gt;&lt;/c&gt;&lt;/b&gt;&lt;/a&gt;&lt;/root&gt;"
+
+  //            navigation can be
+  //            domain-specific
+  //                  v
+  let parser1 = many (child|-&gt;name) &gt;. !@"font"
+  //            ^             ^
+  //       packed with      easy to
+  //       lots of          extend
+  //       combinators
+
+  test root1 parser1
+
+  //
+
+  let parser2 = parent|-&gt;name &lt;/&gt; parser1
+
+  test root1 parser2
 </code></pre>
 
-<pre><code>val r : (int * E) Reply = S (4, &lt;span t="(" /&gt;)
+<pre><code>(S "DeepDescent", XParsec+Source`2[XElement,XElement])
+(S "DeepDescent", XParsec+Source`2[XElement,XElement])
 </code></pre>
 
 <h1>Browse</h1>
@@ -45,7 +74,7 @@ let r = next &gt;. !@"font"|-&gt;String.length .&gt; "font"@~?"B" .&gt;. next .&
 <ul>
 <li><a href="https://github.com/corsis/XParsec/blob/master/XParsec.fsi">Signatures</a></li>
 <li><a href="https://github.com/corsis/XParsec/blob/master/XParsec.fs">Implementation</a></li>
-</ul><h2>Contact</h2>
+</ul><h1>Contact</h1>
 
 <p><a href="https://github.com/corsis/"><img src="http://portfusion.sourceforge.net/i/l100.png" alt="corsis" title="Corsis Research"></a></p>
         </section>
