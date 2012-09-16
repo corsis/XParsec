@@ -10,8 +10,8 @@ module XParsec
 #r "System.Xml.Linq.dll"
 #endif
 
+
 open System
-open System.Collections.Generic
 
 
 let inline Δ<'a> = Unchecked.defaultof<'a>
