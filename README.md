@@ -1,4 +1,4 @@
-**XParsec** can work with any type (FParsec only with `Char`s) and [navigation can be domain-specific](https://github.com/corsis/XParsec/blob/f6bc93499a588b287dc20f622fb917e1edac58b8/XParsec.fsi#L90) (FParsec can only go forward in one dimensional strings.)
+**XParsec** can work with **any type** and **[navigation can be domain-specific](https://github.com/corsis/XParsec/blob/f6bc93499a588b287dc20f622fb917e1edac58b8/XParsec.fsi#L90)**. FParsec only works with `Char`s and can only go forward in one dimensional strings.)
 
 Here we use our first source provider [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/f6bc93499a588b287dc20f622fb917e1edac58b8/XParsec.fsi#L90) but you can [implement your own very easily](https://github.com/corsis/XParsec/blob/f6bc93499a588b287dc20f622fb917e1edac58b8/XParsec.fs#L111).
 
