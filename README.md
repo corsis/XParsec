@@ -1,13 +1,16 @@
 # Example
 
 ```
+  open XParsec
+  open XParsec.Xml // just one source provider, you can implement your own!
+
   let show x          = printfn "%A" x
   let test root parse = root |> enter |> parse |> show
   let name (e : E)    = string e.Name // easy to extend
 
   //
 
-  let root1 = E.Parse "<root><a><b><c><d font='DeepDescent'></d></c></b></a></root>"
+  let root1 = E.Parse "<root><a><b><c><d font='Arial'></d></c></b></a></root>"
 
   //            navigation can be
   //            domain-specific
@@ -28,8 +31,8 @@
 ```
 
 ```
-(S "DeepDescent", XParsec+Source`2[System.Xml.Linq.XElement,System.Xml.Linq.XElement])
-(S "DeepDescent", XParsec+Source`2[System.Xml.Linq.XElement,System.Xml.Linq.XElement])
+(S "DeepDescent", XParsec+Source`2[XElement,XElement])
+(S "DeepDescent", XParsec+Source`2[XElement,XElement])
 ```
 
 # Browse
@@ -37,7 +40,7 @@
 + [Signatures](https://github.com/corsis/XParsec/blob/master/XParsec.fsi)
 + [Implementation](https://github.com/corsis/XParsec/blob/master/XParsec.fs)
 
-## Contact
+# Contact
 
 [![corsis]](https://github.com/corsis/)
 
