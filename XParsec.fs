@@ -35,14 +35,13 @@ type Parser<'s,'a,'b> = Source<'s,'a> -> Reply<'b> * Source<'s,'a>
 
 let inline reply   (r,_) = r
 let inline source  (_,s) = s
-let inline current (s:Source<'s,'a>) = s.Current
 
 
 module Combinators =
 
   let inline (?->) b x = if b then Some x else None
 
-  let inline current s = S <| current s,s
+  let inline current (s : Source<_,_>) = S <| s.Current,s
 
   let inline attempt (p : Parser<_,_,_>)   (s : Source<_,_>) = let r,_ = p s in r,s
   let inline negate  (p : Parser<_,_,_>)    s                = let r,s = p s in Reply<_>.Negate   r,s
@@ -101,28 +100,28 @@ module Xml =
     
           
   module Parsers =
-    let inline ( !@   ) a   s = let x = (current s : E).Attribute(!> a) in (if x <> null then S x.Value else F),s
-    let inline ( !@~  ) a   s = let r = ( current s @~ a        |> Reply<_>.FromBool) in r,s
-    let inline ( !@+  ) a   s = let r = ( current s @~ a |> not |> Reply<_>.FromBool) in r,s
-    let inline (  @~? ) a v s = let r = ((current s @? a <| v)  |> Reply<_>.FromBool) in r,s
-    let inline (  @~! ) a v s = let r = ((current s @! a <| v)  |> Reply<_>.FromBool) in r,s
+    let inline ( !@   ) a   (s : Source<_,E>) = let x = ( s.Current : E ).Attribute(!> a) in (if x <> null then S x.Value else F),s
+    let inline ( !@~  ) a   (s : Source<_,E>) = let r = ( s.Current @~ a        |> Reply<_>.FromBool) in r,s
+    let inline ( !@+  ) a   (s : Source<_,E>) = let r = ( s.Current @~ a |> not |> Reply<_>.FromBool) in r,s
+    let inline (  @~? ) a v (s : Source<_,E>) = let r = ((s.Current @? a <| v)  |> Reply<_>.FromBool) in r,s
+    let inline (  @~! ) a v (s : Source<_,E>) = let r = ((s.Current @! a <| v)  |> Reply<_>.FromBool) in r,s
 
 
   module Sources =
 
     type N = XNode
-    let inline nextNode (e : N) = e.NextNode
-    let inline prevNode (e : N) = e.PreviousNode
-    let rec find<'a when 'a :> N> (f : N -> N) (n : N) = match f n with :?'a as x -> x | null -> Δ | node -> find f node
+    let inline next' (n:N) = let mutable c = Δ in (while (c <- n.NextNode;     match c with :? E as e -> true | _ -> false) do ()); match c with :? E as e -> e | _ -> null
+    let inline prev' (n:N) = let mutable c = Δ in (while (c <- n.PreviousNode; match c with :? E as e -> true | _ -> false) do ()); match c with :? E as e -> e | _ -> null
 
     type XElement with
-      member inline     e.NextElement : E = find nextNode e
-      member inline e.PreviousElement : E = find prevNode e
-      member inline           e.Child : E = try e.Elements() |> Seq.head with _ -> Δ
+      member inline     e.NextElement = next' e
+      member inline e.PreviousElement = prev' e
+      member inline           e.Child = if e.HasElements then e.Elements() |> Seq.head else Δ
+      member inline          e.Source = Source(e,e)
 
-    let inline enter (e:E) = Source(e,e)
+    let inline enter (e:E) = e.Source
 
-    let next   s = match (current s : E).NextElement     with null -> F,s | x -> S x,enter x
-    let prev   s = match (current s : E).PreviousElement with null -> F,s | x -> S x,enter x
-    let parent s = match (current s : E).Parent          with null -> F,s | x -> S x,enter x
-    let child  s = match (current s : E).Child           with null -> F,s | x -> S x,enter x
+    let next   (s : Source<_,E>) = match s.Current.NextElement     with null -> F,s | x -> S x,enter x
+    let prev   (s : Source<_,E>) = match s.Current.PreviousElement with null -> F,s | x -> S x,enter x
+    let parent (s : Source<_,E>) = match s.Current.Parent          with null -> F,s | x -> S x,enter x
+    let child  (s : Source<_,E>) = match s.Current.Child           with null -> F,s | x -> S x,enter x

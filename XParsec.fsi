@@ -27,7 +27,6 @@ type Parser<'s,'a,'b> = Source<'s,'a> -> Reply<'b> * Source<'s,'a>
 
 val inline reply   : 'b*_  -> 'b
 val inline source  :  _*'s -> 's
-val inline current : Source<_,'a> -> 'a
 
 [<AutoOpen>]
 module Combinators =
@@ -79,17 +78,17 @@ module Xml =
 
   [<AutoOpen>]
   module Parsers =
-    val inline ( !@   )  :    A ->           Parser<'s, E,string>
-    val inline ( !@~  )  :    A ->           Parser<'s,#E,unit>
-    val inline ( !@+  )  :    A ->           Parser<'s,#E,unit>
-    val inline (  @~? )  :    A -> string -> Parser<'s,#E,unit>
-    val inline (  @~! )  :    A -> string -> Parser<'s,#E,unit>
+    val inline ( !@   )  :    A ->           Parser<'s,E,string>
+    val inline ( !@~  )  :    A ->           Parser<'s,E,unit>
+    val inline ( !@+  )  :    A ->           Parser<'s,E,unit>
+    val inline (  @~? )  :    A -> string -> Parser<'s,E,unit>
+    val inline (  @~! )  :    A -> string -> Parser<'s,E,unit>
 
   [<AutoOpen>]
   module Sources =
     val inline enter : E -> Source<E,E>
 
-    val next   :      Parser<E,E,E>
-    val prev   :      Parser<E,E,E>
-    val parent :      Parser<E,E,E>
-    val child  :      Parser<E,E,E>
+    val next   : Parser<E,E,E>
+    val prev   : Parser<E,E,E>
+    val parent : Parser<E,E,E>
+    val child  : Parser<E,E,E>
