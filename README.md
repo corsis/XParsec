@@ -1,4 +1,4 @@
-**XParsec** works with [**any type**](https://github.com/corsis/XParsec/blob/3455302e80afade6685adf5ba22df9abf178fe23/XParsec.fsi#L26), is [**very easy to extend**](https://github.com/corsis/XParsec/blob/3455302e80afade6685adf5ba22df9abf178fe23/XParsec.fs#L102) and supports **[domain-specific non-linear navigation](https://github.com/corsis/XParsec/blob/3455302e80afade6685adf5ba22df9abf178fe23/XParsec.fsi#L88)**.
+**XParsec** works with **[any type](https://github.com/corsis/XParsec/blob/3455302e80afade6685adf5ba22df9abf178fe23/XParsec.fsi#L26)**, is **[very easy to extend](https://github.com/corsis/XParsec/blob/3455302e80afade6685adf5ba22df9abf178fe23/XParsec.fs#L102)**, supports **[domain-specific non-linear navigation](https://github.com/corsis/XParsec/blob/3455302e80afade6685adf5ba22df9abf178fe23/XParsec.fsi#L88)**.
 
 (FParsec only works with `Char`s and can only go forward on a one dimensional `String`.)
 
