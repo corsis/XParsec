@@ -20,7 +20,7 @@
     <header>
       <div class="inner">
         <h1>XParsec</h1>
-        <h2>a type-and-source-polymorphic, generalized and extensible parsec implementation in F# which supports domain-specific non-linear navigation combinators (such as for XML trees)</h2>
+        <h2>an extensible, type-and-source-polymorphic, non-linear applicative parser combinator library in F# 3.0</h2>
         <a href="https://github.com/corsis/XParsec" class="button"><small>View project on</small>GitHub</a>
       </div>
     </header>
@@ -36,7 +36,10 @@
 
 <p>Here we use <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L61"><code>XParsec.Xml</code></a> which provides the first XParsec extension <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fs#L102">implemented in just 19 lines of F#</a>.</p>
 
-<div class="highlight"><pre>  <span class="k">let</span> <span class="n">show</span> <span class="n">reply</span> <span class="o">=</span> <span class="n">printfn</span> <span class="s2">"%A"</span> <span class="n">reply</span>
+<div class="highlight"><pre>  <span class="k">open</span> <span class="nc">XParsec</span>
+  <span class="k">open</span> <span class="nn">XParsec</span><span class="p">.</span><span class="nc">Xml</span>
+
+  <span class="k">let</span> <span class="n">show</span> <span class="n">reply</span> <span class="o">=</span> <span class="n">printfn</span> <span class="s2">"%A"</span> <span class="n">reply</span>
   <span class="k">let</span> <span class="n">test</span> <span class="n">parse</span> <span class="o">=</span> <span class="n">show</span> <span class="o">&lt;&lt;</span> <span class="n">reply</span> <span class="o">&lt;&lt;</span> <span class="n">parse</span> <span class="o">&lt;&lt;</span> <span class="n">enter</span>
   <span class="k">let</span> <span class="n">name</span> <span class="o">(</span><span class="n">e</span><span class="o">:</span><span class="nc">E</span><span class="o">)</span> <span class="o">=</span> <span class="kt">string</span> <span class="n">e</span><span class="o">.</span><span class="nc">Name</span>                              <span class="c1">// E = XElement</span>
 
