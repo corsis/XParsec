@@ -44,8 +44,8 @@ S ((["a"; "b"; "c"; "d"], "Arial"), "root")
 
 # Browse
 
-+ [Signatures](https://github.com/corsis/XParsec/blob/master/XParsec.fsi)
-+ [Implementation](https://github.com/corsis/XParsec/blob/master/XParsec.fs)
++ [Signatures](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#slider)
++ [Implementation](https://github.com/corsis/XParsec/blob/master/XParsec.fs#slider)
 
 # License
 
