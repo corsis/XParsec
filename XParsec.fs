@@ -113,11 +113,7 @@ module Xml =
     type N = XNode
     let inline nextNode (e : N) = e.NextNode
     let inline prevNode (e : N) = e.PreviousNode
-    let rec find<'a when 'a :> N> (f : N -> N) (n : N) =
-      match f n with
-      | :?'a as x -> x
-      | null      -> Δ
-      | node      -> find f node
+    let rec find<'a when 'a :> N> (f : N -> N) (n : N) = match f n with :?'a as x -> x | null -> Δ | node -> find f node
 
     type XElement with
       member inline     e.NextElement : E = find nextNode e
