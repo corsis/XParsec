@@ -13,38 +13,14 @@ module XParsec
 open System
 open System.Collections.Generic
 
-module Streams =
 
-  type 'a ArrayEnumerator (a : 'a [], ?i : int) as e =
-    let         l = a.Length
-    let mutable s = -1 |> defaultArg i
-    member e.Current           = a.[s]
-    member e.Reset          () = s <- -1 |> defaultArg i
-    member e.MoveNext       () = let i = s + 1 in if i <  l then s <- i; true else false
-    member e.MoveBack       () = let i = s - 1 in if i > -1 then s <- i; true else false
-    member e.State with get () = s and   set i =  if i <  l then s <- i       else raise <| ArgumentOutOfRangeException()
-    member e.Copy           ()           = new ArrayEnumerator<_>(a, s)
-    static member inline New (a : 'a []) = new ArrayEnumerator<_>(a)
-    interface 'a IEnumerator with
-      member i.Current     = e.Current
-    interface Collections.IEnumerator with
-      member i.Current     = e.Current :> obj
-      member i.MoveNext () = e.MoveNext ()
-      member i.Reset    () = e.Reset    ()
-    interface IDisposable with
-      member i.Dispose  () = ()
+let inline Δ<'a> = Unchecked.defaultof<'a>
 
-  type 'a IEnumerator with
-    member inline e.Copy     () = (e :?> 'a ArrayEnumerator).Copy     ()
-    member inline e.MoveBack () = (e :?> 'a ArrayEnumerator).MoveBack ()
-
-  type 'a  E = 'a     IEnumerator
-  type 'a AE = 'a ArrayEnumerator
-  type 'a  S = 'a      E
-
-  type 'a  Stream = 'a S
-
-open Streams
+[<Struct>]
+type Source<'s,'a> =
+  val State   : 's
+  val Current : 'a
+  new (s : 's, c : 'a) = { State = s; Current = c }
 
 type 'a Reply = S of 'a | F with
   member inline r.Value   = match r with S x -> x | F -> raise <| new InvalidOperationException()
@@ -55,56 +31,61 @@ type 'a Reply = S of 'a | F with
   static member inline Map    f r = match r with F -> F    | S x -> S <| f x
   static member inline Choose f r = match r with F -> F    | S x -> match f x with Some v -> S v | None -> F
 
-type 'a R = 'a Reply
+type Parser<'s,'a,'b> = Source<'s,'a> -> Reply<'b> * Source<'s,'a>
 
-type      P<'a,'b> = 'a Stream -> 'b Reply
-type Parser<'a,'b> = 'a Stream -> 'b Reply
+let inline reply   (r,_) = r
+let inline source  (_,s) = s
+let inline current (s:Source<'s,'a>) = s.Current
+
 
 module Combinators =
 
-  let inline Δ<'a>         = Unchecked.defaultof<'a>
-  let inline (?->) b x     = if b then Some x else None
-  let inline back (s :_ S) = s.MoveBack() |> ignore
+  let inline (?->) b x = if b then Some x else None
 
-  let inline attempt (p : P<_,_>) (s : _ S) = s.Copy() |> p
-  let inline negate  (p : P<_,_>)  s        = s        |> p |> Reply<_>.Negate
+  let inline current s = S <| current s,s
 
-  let inline pzero     (_ : _ S) = S Δ
-  let inline preturn x (_ : _ S) = S x
+  let inline attempt (p : Parser<_,_,_>)   (s : Source<_,_>) = let r,_ = p s in r,s
+  let inline negate  (p : Parser<_,_,_>)    s                = let r,s = p s in Reply<_>.Negate   r,s
+  let inline (|->)   (p : Parser<_,_,_>) f  s                = let r,s = p s in Reply<_>.Map    f r,s
+  let inline (|?>)   (p : Parser<_,_,_>) f  s                = let r,s = p s in Reply<_>.Choose f r,s
 
-  let inline current   (e : _ S) = e.Current |> S
-  let inline next      (e : _ S) = if e.MoveNext() then e |> current else F
+  let inline (.> ) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> F,s | S p -> let r,s = q s in Reply<_>.Put p r,s
+  let inline ( >.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> F,s | S _ -> q s
+  let inline (.>.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> F,s | S p -> let r,s = q s in Reply<_>.Map (fun q -> (p,q)) r,s
+  let inline (</>) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> q s | p   -> p,s
 
-  let inline (|->) (p : P<_,_>) f e = e |> p |> Reply<_>.Map    f
-  let inline (|?>) (p : P<_,_>) f e = e |> p |> Reply<_>.Choose f
-  let inline (.> ) (p : P<_,_>) (q : P<_,_>) e = match p e with F -> F   | S p -> q e |> Reply<_>.Put p
-  let inline ( >.) (p : P<_,_>) (q : P<_,_>) e = match p e with F -> F   | S _ -> q e
-  let inline (.>.) (p : P<_,_>) (q : P<_,_>) e = match p e with F -> F   | S p -> q e |> Reply<_>.Map (fun q -> (p,q))
-  let inline (</>) (p : P<_,_>) (q : P<_,_>) e = match p e with F -> q e | s   -> s
+  let inline many       (p : Parser<_,_,_>) s =
+    let b = ref    Δ
+    let l = ref (Δ,s)
+    let q = Seq.toList <| seq { while (b := source !l; l := p !b; (reply !l).IsMatch) do yield (reply !l).Value }
+    S q,!b
+  let inline many1      (p : Parser<_,_,_>) s = let r,s = s |> many p in Reply<_>.Choose (function _::_ as l -> Some l | _ -> None)                        r,s
+  let inline array n    (p : Parser<_,_,_>) s = let r,s = s |> many p in Reply<_>.Choose (function l -> let a = l |> List.toArray in (a.Length = n) ?-> a) r,s
 
-  let inline many    (p : P<_,_>) (s : _ S) = let r = ref Δ in let q = Seq.toList <| seq { while (r := p s; (!r).IsMatch) do yield (!r).Value } in back s; S q
-  let inline many1   (p : P<_,_>) (s : _ S) = s |> many p |> Reply<_>.Choose (function _::_ as l -> Some l | _ -> None)
-  let inline array n (p : P<_,_>) (s : _ S) = s |> many p |> Reply<_>.Choose (function l -> let a = l |> List.toArray in (a.Length = n) ?-> a)
-
-  let inline skipMany'  (p : P<_,_>) (s : _ S) = let c = ref 0 in (while (p s).IsMatch do c := !c + 1); back s; S !c
-  let inline skipMany1' (p : P<_,_>) (s : _ S) = s |> skipMany'  p |> Reply<_>.Choose (fun n -> if n > 0 then Some n  else None)
-  let inline skipMany   (p : P<_,_>) (s : _ S) = s |> skipMany'  p |> Reply<_>.Put ()
-  let inline skipMany1  (p : P<_,_>) (s : _ S) = s |> skipMany1' p |> Reply<_>.Put ()
-  let inline skipN   i  (p : P<_,_>) (s : _ S) = s |> skipMany'  p |> Reply<_>.Choose (fun n -> if n = i then Some () else None)
+  let inline skipMany'  (p : Parser<_,_,_>) s =
+    let b = ref    Δ
+    let l = ref (Δ,s)
+    let c = ref  0
+    let q = Seq.toList <| seq { while (b := source !l; l := p !b; (reply !l).IsMatch) do c := !c + 1 }
+    S !c,!b
+  let inline skipMany1' (p : Parser<_,_,_>) s = let r,s = s |> skipMany'  p in Reply<_>.Choose (fun n -> if n > 0 then Some n  else None) r,s
+  let inline skipN   i  (p : Parser<_,_,_>) s = let r,s = s |> skipMany'  p in Reply<_>.Choose (fun n -> if n = i then Some () else None) r,s
+  let inline skipMany   (p : Parser<_,_,_>) s = let r,s = s |> skipMany'  p in Reply<_>.Put    ()                                         r,s
+  let inline skipMany1  (p : Parser<_,_,_>) s = let r,s = s |> skipMany1' p in Reply<_>.Put    ()                                         r,s
 
   let inline (!*) p s = skipMany  p s
   let inline (!+) p s = skipMany1 p s
 
-  let inline (|?=) (p : P<_,_>) q = p |?> function (x1,y1),(x2,y2) -> if q x1 x2 then Some (y1,y2) else None
-  let inline (|=?) (p : P<_,_>) q = p |?> function (x1,y1),(x2,y2) -> if q y1 y2 then Some (x1,x2) else None
 
 module Xml =
 
-  type E = System.Xml.Linq.XElement
+  open System.Xml.Linq
+
+  type E = XElement
   type A = string // Attribute Name
 
-  module Operators =
 
+  module Operators =
     let inline (!>)  x   = ( ^a : (static member op_Implicit : ^b -> ^a) x )
     let inline (~~)  s   = s |> String.IsNullOrWhiteSpace
     let inline (-!-) a b = (a : string).Contains b |> not
@@ -116,12 +97,36 @@ module Xml =
     let inline (@!)  e    a v =   (e @ a) -!- v
     let inline (@~)  e    a   = ~~(e @ a)
 
+  open Operators
+    
+          
   module Parsers =
+    let inline ( !@   ) a   s = let x = (current s : E).Attribute(!> a) in (if x <> null then S x.Value else F),s
+    let inline ( !@~  ) a   s = let r = ( current s @~ a        |> Reply<_>.FromBool) in r,s
+    let inline ( !@+  ) a   s = let r = ( current s @~ a |> not |> Reply<_>.FromBool) in r,s
+    let inline (  @~? ) a v s = let r = ((current s @? a <| v)  |> Reply<_>.FromBool) in r,s
+    let inline (  @~! ) a v s = let r = ((current s @! a <| v)  |> Reply<_>.FromBool) in r,s
 
-    open Operators
 
-    let inline ( !@   ) a   (s : E S) = let x = s.Current.Attribute(!> a) in if x <> null then S x.Value else F
-    let inline ( !@~  ) a   (s : E S) = (s.Current @~ a       ) |> Reply<_>.FromBool
-    let inline ( !@+  ) a   (s : E S) = (s.Current @~ a |> not) |> Reply<_>.FromBool
-    let inline (  @~? ) a v (s : E S) = (s.Current @? a <| v)   |> Reply<_>.FromBool
-    let inline (  @~! ) a v (s : E S) = (s.Current @! a <| v)   |> Reply<_>.FromBool
+  module Sources =
+
+    type N = XNode
+    let inline nextNode (e : N) = e.NextNode
+    let inline prevNode (e : N) = e.PreviousNode
+    let rec find<'a when 'a :> N> (f : N -> N) (n : N) =
+      match f n with
+      | :?'a as x -> x
+      | null      -> Δ
+      | node      -> find f node
+
+    type XElement with
+      member inline     e.NextElement : E = find nextNode e
+      member inline e.PreviousElement : E = find prevNode e
+      member inline           e.Child : E = try e.Elements() |> Seq.head with _ -> Δ
+
+    let inline enter (e:E) = Source(e,e)
+
+    let next   s = match (current s : E).NextElement     with null -> F,s | x -> S x,enter x
+    let prev   s = match (current s : E).PreviousElement with null -> F,s | x -> S x,enter x
+    let parent s = match (current s : E).Parent          with null -> F,s | x -> S x,enter x
+    let child  s = match (current s : E).Child           with null -> F,s | x -> S x,enter x
