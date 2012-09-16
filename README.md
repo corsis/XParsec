@@ -7,9 +7,6 @@
 Here we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L61) which provides the first XParsec extension [implemented in just 19 lines of F#](https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fs#L102).
 
 ```fsharp
-  open XParsec
-  open XParsec.Xml
-
   let show reply = printfn "%A" reply
   let test parse = show << reply << parse << enter
   let name (e:E) = string e.Name                              // E = XElement
@@ -28,16 +25,22 @@ Here we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/0284b134a566a
   let parser2 = !*child >. !@"font"
   let parser3 =  parent => name </> parser2
 
-  // graceful look-ahead
+  // graceful non-linear look-ahead (here = down in Xml)
   let parser4 = attempt parser1 .>. (current => name)
 
-  test parser1 root; test parser2 root; test parser3 root; test parser4 root
+  // brand-new non-linear look-back (here = up   in Xml)
+  let S d,_   = enter root |> (!*child >. current)
+  let parser5 = attempt <| many (parent => name) .>. (current => name)
+
+  test parser1 root; test parser2 root; test parser3 root
+  test parser4 root; test parser5 d
 ```
 ```fsharp
 S (["a"; "b"; "c"; "d"], "Arial")
 S "Arial"
 S "Arial"
 S ((["a"; "b"; "c"; "d"], "Arial"), "root")
+S (["c"; "b"; "a"; "root"], "d")
 ```
 
 # Browse
