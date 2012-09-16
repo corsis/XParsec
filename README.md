@@ -10,8 +10,7 @@ Here we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/0284b134a566a
   open XParsec
   open XParsec.Xml
 
-  let show reply = printfn "%A" reply
-  let test parse = show << reply << parse << enter
+  let test parse = printfn "%A" << reply << parse << enter
   let name (e:E) = string e.Name                              // E = XElement
 
   let root = E.Parse "<root><a><b><c><d font='Arial'></d></c></b></a></root>"
@@ -25,22 +24,19 @@ Here we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/0284b134a566a
   //        combinators     extensibility
 
   // graceful choices
-  let parser2 = !*child >. !@"font"
-  let parser3 =  parent => name </> parser2
+  let parser2 = (parent => name) </> (!*child >. !@"font")
 
   // graceful non-linear look-ahead (here = down in Xml)
-  let parser4 = attempt parser1 .>. (current => name)
+  let parser3 = attempt parser1 .>. (current => name)
 
   // brand-new non-linear look-back (here = up   in Xml)
   let S d,_   = enter root |> (!*child >. current)
-  let parser5 = attempt <| many (parent => name) .>. (current => name)
+  let parser4 = attempt <| many (parent => name) .>. (current => name)
 
-  test parser1 root; test parser2 root; test parser3 root
-  test parser4 root; test parser5 d
+  test parser1 root; test parser2 root; test parser3 root; test parser4 d
 ```
 ```fsharp
 S (["a"; "b"; "c"; "d"], "Arial")
-S "Arial"
 S "Arial"
 S ((["a"; "b"; "c"; "d"], "Arial"), "root")
 S (["c"; "b"; "a"; "root"], "d")
