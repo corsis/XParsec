@@ -1,14 +1,9 @@
 # Example
 
 ```
-  open XParsec
-  open XParsec.Xml
-
-  let show x = printfn "%A" x
-
+  let show x          = printfn "%A" x
   let test root parse = root |> enter |> parse |> show
-
-  let name (e : E) = string e.Name     // easy to extend
+  let name (e : E)    = string e.Name // easy to extend
 
   //
 
