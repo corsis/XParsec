@@ -10,13 +10,13 @@ Below we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/c79ce4ef4ec7
   open XParsec
   open XParsec.Xml
 
-  let show x          = printfn "%A" x
-  let test root parse = root |> enter |> parse |> show
-  let name (e : E)    = string e.Name
-  //            ^
-  //           XElement
+  let show reply = printfn "%A" reply
+  let test parse = enter >> parse >> reply >> show
+  let name (e:E) = string e.Name
+  //          ^
+  //         XElement
 
-  let root1 = E.Parse "<root><a><b><c><d font='Arial'></d></c></b></a></root>"
+  let root = E.Parse "<root><a><b><c><d font='Arial'></d></c></b></a></root>"
 
   //             domain-specific
   //                navigation
@@ -30,12 +30,12 @@ Below we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/c79ce4ef4ec7
   let parser2 = !*child >. !@"font"
   let parser3 =  parent => name </> parser2
 
-  test root1 parser1; test root1 parser2; test root1 parser3
+  test parser1 root; test parser2 root; test parser3 root
 ```
 ```fsharp
-(S (["a"; "b"; "c"; "d"], "Arial"), XParsec+Source`2[XElement,XElement])
-(S "Arial", XParsec+Source`2[XElement,XElement])
-(S "Arial", XParsec+Source`2[XElement,XElement])
+S (["a"; "b"; "c"; "d"], "Arial")
+S "Arial"
+S "Arial"
 ```
 
 # Browse
