@@ -1,10 +1,13 @@
-**XParsec** can work with **any type** and **[navigation can be domain-specific](https://github.com/corsis/XParsec/blob/f6bc93499a588b287dc20f622fb917e1edac58b8/XParsec.fsi#L90)**. FParsec only works with `Char`s and can only go forward in one dimensional strings.)
+**XParsec** can work with **any type**, supports **[domain-specific non-linear navigation](https://github.com/corsis/XParsec/blob/16de327b98410e3031636ffa86572e12d52f4594/XParsec.fsi#L88)** and is [**very easy to extend**](https://github.com/corsis/XParsec/blob/f6bc93499a588b287dc20f622fb917e1edac58b8/XParsec.fs#L111).
 
-Here we use our first source provider [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/f6bc93499a588b287dc20f622fb917e1edac58b8/XParsec.fsi#L90) but you can [implement your own very easily](https://github.com/corsis/XParsec/blob/f6bc93499a588b287dc20f622fb917e1edac58b8/XParsec.fs#L111).
+(FParsec only works with `Char`s and can only go forward on a one dimensional string.)
+
 
 # Example
 
-```
+Here we use our first source provider [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/16de327b98410e3031636ffa86572e12d52f4594/XParsec.fsi#L80) – the first XParsec extension [implemented in just 19 lines of F#](https://github.com/corsis/XParsec/blob/16de327b98410e3031636ffa86572e12d52f4594/XParsec.fs#L103).
+
+```fsharp
   open XParsec
   open XParsec.Xml
 
@@ -12,31 +15,28 @@ Here we use our first source provider [`XParsec.Xml`](https://github.com/corsis/
   let test root parse = root |> enter |> parse |> show
   let name (e : E)    = string e.Name // easy to extend
 
-  //
-
   let root1 = E.Parse "<root><a><b><c><d font='Arial'></d></c></b></a></root>"
 
   //            navigation can be
   //            domain-specific
   //                  v
-  let parser1 = many (child|->name) >. !@"font"
+  let parser1 = many (child|->name) .>. !@"font"
   //            ^             ^
   //       packed with      easy to
   //       lots of          extend
   //       combinators
 
-  test root1 parser1
+  // choices are handled with grace
+  let parser2 = many child >. !@"font"
+  let parser3 = parent|->name </> parser2
 
-  //
-
-  let parser2 = parent|->name </> parser1
-
-  test root1 parser2
+  test root1 parser1; test root1 parser2; test root1 parser3
 ```
 
-```
-(S "DeepDescent", XParsec+Source`2[XElement,XElement])
-(S "DeepDescent", XParsec+Source`2[XElement,XElement])
+```fsharp
+(S (["a"; "b"; "c"; "d"], "Arial"), XParsec+Source`2[XElement,XElement])
+(S "Arial", XParsec+Source`2[XElement,XElement])
+(S "Arial", XParsec+Source`2[XElement,XElement])
 ```
 
 # Browse
