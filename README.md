@@ -33,7 +33,7 @@ Here we use our first source provider [`XParsec.Xml`](https://github.com/corsis/
   test root1 parser1; test root1 parser2; test root1 parser3
 ```
 
-```
+```fsharp
 (S (["a"; "b"; "c"; "d"], "Arial"), XParsec+Source`2[XElement,XElement])
 (S "Arial", XParsec+Source`2[XElement,XElement])
 (S "Arial", XParsec+Source`2[XElement,XElement])
