@@ -87,4 +87,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [![corsis]](https://github.com/corsis/)
 
+[cetin@corsis.eu](mailto:fusion@corsis.eu)
+
 [corsis]: http://portfusion.sourceforge.net/i/l100.png "Corsis Research"
