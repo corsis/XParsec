@@ -18,7 +18,7 @@
     <div class="wrapper">
       <header>
         <h1>XParsec</h1>
-        <p>extensible, type-and-source-polymorphic, non-linear applicative parser combinator library in F# 3.0</p>
+        <p>an extensible, type-and-source-polymorphic, non-linear applicative parser combinator library in F# 3.0</p>
         <p class="view"><a href="https://github.com/corsis/XParsec">View the Project on GitHub <small>corsis/XParsec</small></a></p>
         <ul>
           <li><a href="https://github.com/corsis/XParsec/zipball/master">Download <strong>ZIP File</strong></a></li>
@@ -27,13 +27,13 @@
         </ul>
       </header>
       <section>
-        <p>works with <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L26"><strong>any type</strong></a>, is <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fs#L102"><strong>very easy to extend</strong></a> and supports <strong><a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L88">domain-specific non-linear navigation</a></strong>.</p>
+        <p><strong>XParsec</strong> works with <a href="https://github.com/corsis/XParsec/blob/3455302e80afade6685adf5ba22df9abf178fe23/XParsec.fsi#L26"><strong>any type</strong></a>, is <a href="https://github.com/corsis/XParsec/blob/3455302e80afade6685adf5ba22df9abf178fe23/XParsec.fs#L102"><strong>very easy to extend</strong></a> and supports <strong><a href="https://github.com/corsis/XParsec/blob/3455302e80afade6685adf5ba22df9abf178fe23/XParsec.fsi#L88">domain-specific non-linear navigation</a></strong>.</p>
 
 <p>(FParsec only works with <code>Char</code>s and can only go forward on a one dimensional <code>String</code>.)</p>
 
 <h1>Example</h1>
 
-<p>Here we use <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L61"><code>XParsec.Xml</code></a> which provides the first XParsec extension <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fs#L102">implemented in just 19 lines of F#</a>.</p>
+<p>Here we use <a href="https://github.com/corsis/XParsec/blob/3455302e80afade6685adf5ba22df9abf178fe23/XParsec.fsi#L61"><code>XParsec.Xml</code></a> which provides the first XParsec extension <a href="https://github.com/corsis/XParsec/blob/3455302e80afade6685adf5ba22df9abf178fe23/XParsec.fs#L102">implemented in just 19 lines of F#</a>.</p>
 
 <div class="highlight"><pre>  <span class="k">open</span> <span class="nc">XParsec</span>
   <span class="k">open</span> <span class="nn">XParsec</span><span class="p">.</span><span class="nc">Xml</span>
