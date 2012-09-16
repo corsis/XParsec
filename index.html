@@ -28,13 +28,13 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <p><strong>XParsec</strong> can work with <strong>any type</strong>, supports <strong><a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L88">domain-specific non-linear navigation</a></strong> and is <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fs#102"><strong>very easy to extend</strong></a>.</p>
+          <p><strong>XParsec</strong> works with <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L26"><strong>any type</strong></a>, supports <strong><a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L88">domain-specific non-linear navigation</a></strong> and is <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fs#L102"><strong>very easy to extend</strong></a>.</p>
 
 <p>(FParsec only works with <code>Char</code>s and can only go forward on a one dimensional string.)</p>
 
 <h1>Example</h1>
 
-<p>Below we use <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L61"><code>XParsec.Xml</code></a> which provides the first XParsec extension <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fs#L102">implemented in just 19 lines of F#</a>.</p>
+<p>Here we use <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L61"><code>XParsec.Xml</code></a> which provides the first XParsec extension <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fs#L102">implemented in just 19 lines of F#</a>.</p>
 
 <div class="highlight"><pre>  <span class="k">open</span> <span class="nc">XParsec</span>
   <span class="k">open</span> <span class="nn">XParsec</span><span class="p">.</span><span class="nc">Xml</span>
