@@ -7,15 +7,13 @@
 
 Here we use our first source provider [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/16de327b98410e3031636ffa86572e12d52f4594/XParsec.fsi#L80) – the first XParsec extension [implemented in just 19 lines of F#](https://github.com/corsis/XParsec/blob/16de327b98410e3031636ffa86572e12d52f4594/XParsec.fs#L103).
 
-```
+```fsharp
   open XParsec
   open XParsec.Xml
 
   let show x          = printfn "%A" x
   let test root parse = root |> enter |> parse |> show
   let name (e : E)    = string e.Name // easy to extend
-
-  //
 
   let root1 = E.Parse "<root><a><b><c><d font='Arial'></d></c></b></a></root>"
 
@@ -29,13 +27,10 @@ Here we use our first source provider [`XParsec.Xml`](https://github.com/corsis/
   //       combinators
 
   // choices are handled with grace
-
   let parser2 = many child >. !@"font"
   let parser3 = parent|->name </> parser2
 
-  test root1 parser1
-  test root1 parser2
-  test root1 parser3
+  test root1 parser1; test root1 parser2; test root1 parser3
 ```
 
 ```
