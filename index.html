@@ -36,38 +36,35 @@
 
 <p>Here we use our first source provider <a href="https://github.com/corsis/XParsec/blob/16de327b98410e3031636ffa86572e12d52f4594/XParsec.fsi#L80"><code>XParsec.Xml</code></a> – the first XParsec extension <a href="https://github.com/corsis/XParsec/blob/16de327b98410e3031636ffa86572e12d52f4594/XParsec.fs#L103">implemented in just 19 lines of F#</a>.</p>
 
-<pre><code>  open XParsec
-  open XParsec.Xml
+<div class="highlight"><pre>  <span class="k">open</span> <span class="nc">XParsec</span>
+  <span class="k">open</span> <span class="nn">XParsec</span><span class="p">.</span><span class="nc">Xml</span>
 
-  let show x          = printfn "%A" x
-  let test root parse = root |&gt; enter |&gt; parse |&gt; show
-  let name (e : E)    = string e.Name // easy to extend
+  <span class="k">let</span> <span class="n">show</span> <span class="n">x</span>          <span class="o">=</span> <span class="n">printfn</span> <span class="s2">"%A"</span> <span class="n">x</span>
+  <span class="k">let</span> <span class="n">test</span> <span class="n">root</span> <span class="n">parse</span> <span class="o">=</span> <span class="n">root</span> <span class="o">|&gt;</span> <span class="n">enter</span> <span class="o">|&gt;</span> <span class="n">parse</span> <span class="o">|&gt;</span> <span class="n">show</span>
+  <span class="k">let</span> <span class="n">name</span> <span class="o">(</span><span class="n">e</span> <span class="o">:</span> <span class="nc">E</span><span class="o">)</span>    <span class="o">=</span> <span class="kt">string</span> <span class="n">e</span><span class="o">.</span><span class="nc">Name</span> <span class="c1">// easy to extend</span>
 
-  //
+  <span class="k">let</span> <span class="n">root1</span> <span class="o">=</span> <span class="nn">E</span><span class="p">.</span><span class="nc">Parse</span> <span class="s2">"&lt;root&gt;&lt;a&gt;&lt;b&gt;&lt;c&gt;&lt;d font='Arial'&gt;&lt;/d&gt;&lt;/c&gt;&lt;/b&gt;&lt;/a&gt;&lt;/root&gt;"</span>
 
-  let root1 = E.Parse "&lt;root&gt;&lt;a&gt;&lt;b&gt;&lt;c&gt;&lt;d font='Arial'&gt;&lt;/d&gt;&lt;/c&gt;&lt;/b&gt;&lt;/a&gt;&lt;/root&gt;"
+  <span class="c1">//            navigation can be</span>
+  <span class="c1">//            domain-specific</span>
+  <span class="c1">//                  v</span>
+  <span class="k">let</span> <span class="n">parser1</span> <span class="o">=</span> <span class="n">many</span> <span class="o">(</span><span class="n">child</span><span class="o">|-&gt;</span><span class="n">name</span><span class="o">)</span> <span class="o">.&gt;.</span> <span class="o">!@</span><span class="s2">"font"</span>
+  <span class="c1">//            ^             ^</span>
+  <span class="c1">//       packed with      easy to</span>
+  <span class="c1">//       lots of          extend</span>
+  <span class="c1">//       combinators</span>
 
-  //            navigation can be
-  //            domain-specific
-  //                  v
-  let parser1 = many (child|-&gt;name) &gt;. !@"font"
-  //            ^             ^
-  //       packed with      easy to
-  //       lots of          extend
-  //       combinators
+  <span class="c1">// choices are handled with grace</span>
+  <span class="k">let</span> <span class="n">parser2</span> <span class="o">=</span> <span class="n">many</span> <span class="n">child</span> <span class="o">&gt;.</span> <span class="o">!@</span><span class="s2">"font"</span>
+  <span class="k">let</span> <span class="n">parser3</span> <span class="o">=</span> <span class="n">parent</span><span class="o">|-&gt;</span><span class="n">name</span> <span class="o">&lt;/&gt;</span> <span class="n">parser2</span>
 
-  test root1 parser1
+  <span class="n">test</span> <span class="n">root1</span> <span class="n">parser1</span><span class="o">;</span> <span class="n">test</span> <span class="n">root1</span> <span class="n">parser2</span><span class="o">;</span> <span class="n">test</span> <span class="n">root1</span> <span class="n">parser3</span>
+</pre></div>
 
-  //
-
-  let parser2 = parent|-&gt;name &lt;/&gt; parser1
-
-  test root1 parser2
-</code></pre>
-
-<pre><code>(S "DeepDescent", XParsec+Source`2[XElement,XElement])
-(S "DeepDescent", XParsec+Source`2[XElement,XElement])
-</code></pre>
+<div class="highlight"><pre><span class="o">(</span><span class="nc">S</span> <span class="o">([</span><span class="s2">"a"</span><span class="o">;</span> <span class="s2">"b"</span><span class="o">;</span> <span class="s2">"c"</span><span class="o">;</span> <span class="s2">"d"</span><span class="o">],</span> <span class="s2">"Arial"</span><span class="o">),</span> <span class="nc">XParsec</span><span class="o">+</span><span class="nc">Source</span><span class="o">`</span><span class="mi">2</span><span class="o">[</span><span class="nc">XElement</span><span class="o">,</span><span class="nc">XElement</span><span class="o">])</span>
+<span class="o">(</span><span class="nc">S</span> <span class="s2">"Arial"</span><span class="o">,</span> <span class="nc">XParsec</span><span class="o">+</span><span class="nc">Source</span><span class="o">`</span><span class="mi">2</span><span class="o">[</span><span class="nc">XElement</span><span class="o">,</span><span class="nc">XElement</span><span class="o">])</span>
+<span class="o">(</span><span class="nc">S</span> <span class="s2">"Arial"</span><span class="o">,</span> <span class="nc">XParsec</span><span class="o">+</span><span class="nc">Source</span><span class="o">`</span><span class="mi">2</span><span class="o">[</span><span class="nc">XElement</span><span class="o">,</span><span class="nc">XElement</span><span class="o">])</span>
+</pre></div>
 
 <h1>Browse</h1>
 
