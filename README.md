@@ -2,7 +2,7 @@
 
 (FParsec only works with `Char`s and can only go forward on a one dimensional string.)
 
-# Examples
+# Example
 
 Here we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L61) which provides the first XParsec extension [implemented in just 19 lines of F#](https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fs#L102).
 
