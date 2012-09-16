@@ -22,24 +22,26 @@ Here we use our first source provider [`XParsec.Xml`](https://github.com/corsis/
   //            navigation can be
   //            domain-specific
   //                  v
-  let parser1 = many (child|->name) >. !@"font"
+  let parser1 = many (child|->name) .>. !@"font"
   //            ^             ^
   //       packed with      easy to
   //       lots of          extend
   //       combinators
 
+  // choices are handled with grace
+
+  let parser2 = many child >. !@"font"
+  let parser3 = parent|->name </> parser2
+
   test root1 parser1
-
-  //
-
-  let parser2 = parent|->name </> parser1
-
   test root1 parser2
+  test root1 parser3
 ```
 
 ```
-(S "DeepDescent", XParsec+Source`2[XElement,XElement])
-(S "DeepDescent", XParsec+Source`2[XElement,XElement])
+(S (["a"; "b"; "c"; "d"], "Arial"), XParsec+Source`2[XElement,XElement])
+(S "Arial", XParsec+Source`2[XElement,XElement])
+(S "Arial", XParsec+Source`2[XElement,XElement])
 ```
 
 # Browse
