@@ -30,12 +30,16 @@ Below we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/c79ce4ef4ec7
   let parser2 = !*child >. !@"font"
   let parser3 =  parent => name </> parser2
 
-  test parser1 root; test parser2 root; test parser3 root
+  // graceful look-ahead
+  let parser4 = attempt parser1 .>. (current => name)
+
+  test parser1 root; test parser2 root; test parser3 root; test parser4 root
 ```
 ```fsharp
 S (["a"; "b"; "c"; "d"], "Arial")
 S "Arial"
 S "Arial"
+S ((["a"; "b"; "c"; "d"], "Arial"), "root")
 ```
 
 # Browse
