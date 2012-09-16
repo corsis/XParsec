@@ -34,7 +34,7 @@
 
 <h1>Example</h1>
 
-<p>Below we use <a href="https://github.com/corsis/XParsec/blob/c07865bcebfdaeb6eeb008804aaf33c4dbb400c8/XParsec.fsi#L61"><code>XParsec.Xml</code></a> – the first XParsec extension <a href="https://github.com/corsis/XParsec/blob/c07865bcebfdaeb6eeb008804aaf33c4dbb400c8/XParsec.fs#L102">implemented in just 19 lines of F#</a>.</p>
+<p>Below we use <a href="https://github.com/corsis/XParsec/blob/c79ce4ef4ec7401d1c0db8347fbfce6837078e44/XParsec.fsi#L61"><code>XParsec.Xml</code></a> – the first XParsec extension <a href="https://github.com/corsis/XParsec/blob/c79ce4ef4ec7401d1c0db8347fbfce6837078e44/XParsec.fs#L102">implemented in just 19 lines of F#</a>.</p>
 
 <div class="highlight"><pre>  <span class="k">open</span> <span class="nc">XParsec</span>
   <span class="k">open</span> <span class="nn">XParsec</span><span class="p">.</span><span class="nc">Xml</span>
@@ -47,18 +47,17 @@
 
   <span class="k">let</span> <span class="n">root1</span> <span class="o">=</span> <span class="nn">E</span><span class="p">.</span><span class="nc">Parse</span> <span class="s2">"&lt;root&gt;&lt;a&gt;&lt;b&gt;&lt;c&gt;&lt;d font='Arial'&gt;&lt;/d&gt;&lt;/c&gt;&lt;/b&gt;&lt;/a&gt;&lt;/root&gt;"</span>
 
-  <span class="c1">//            navigation can be</span>
-  <span class="c1">//            domain-specific</span>
-  <span class="c1">//                  v</span>
-  <span class="k">let</span> <span class="n">parser1</span> <span class="o">=</span> <span class="n">many</span> <span class="o">(</span><span class="n">child</span><span class="o">|-&gt;</span><span class="n">name</span><span class="o">)</span> <span class="o">.&gt;.</span> <span class="o">!@</span><span class="s2">"font"</span>
-  <span class="c1">//            ^             ^</span>
-  <span class="c1">//       packed with      easy to</span>
-  <span class="c1">//       lots of          extend</span>
-  <span class="c1">//       combinators</span>
+  <span class="c1">//             domain-specific</span>
+  <span class="c1">//                navigation</span>
+  <span class="c1">//                    v</span>
+  <span class="k">let</span> <span class="n">parser1</span> <span class="o">=</span> <span class="n">many</span> <span class="o">(</span><span class="n">child</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">)</span> <span class="o">.&gt;.</span> <span class="o">!@</span><span class="s2">"font"</span>
+  <span class="c1">//             ^              ^</span>
+  <span class="c1">//         powerful        first-class</span>
+  <span class="c1">//        combinators     extensibility</span>
 
-  <span class="c1">// choices are handled with grace</span>
+  <span class="c1">// graceful choices</span>
   <span class="k">let</span> <span class="n">parser2</span> <span class="o">=</span> <span class="n">many</span> <span class="n">child</span> <span class="o">&gt;.</span> <span class="o">!@</span><span class="s2">"font"</span>
-  <span class="k">let</span> <span class="n">parser3</span> <span class="o">=</span> <span class="n">parent</span><span class="o">|-&gt;</span><span class="n">name</span> <span class="o">&lt;/&gt;</span> <span class="n">parser2</span>
+  <span class="k">let</span> <span class="n">parser3</span> <span class="o">=</span> <span class="n">parent</span> <span class="o">=&gt;</span> <span class="n">name</span> <span class="o">&lt;/&gt;</span> <span class="n">parser2</span>
 
   <span class="n">test</span> <span class="n">root1</span> <span class="n">parser1</span><span class="o">;</span> <span class="n">test</span> <span class="n">root1</span> <span class="n">parser2</span><span class="o">;</span> <span class="n">test</span> <span class="n">root1</span> <span class="n">parser3</span>
 </pre></div>
