@@ -11,7 +11,7 @@ Below we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/c79ce4ef4ec7
   open XParsec.Xml
 
   let show reply = printfn "%A" reply
-  let test parse = enter >> parse >> reply >> show
+  let test parse = show << reply << parse << enter
   let name (e:E) = string e.Name
   //          ^
   //         XElement
