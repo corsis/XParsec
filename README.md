@@ -12,7 +12,7 @@ Here we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/0284b134a566a
 
   let show reply = printfn "%A" reply
   let test parse = show << reply << parse << enter
-  let name (e:E) = string e.Name                    // E = XElement
+  let name (e:E) = string e.Name                              // E = XElement
 
   let root = E.Parse "<root><a><b><c><d font='Arial'></d></c></b></a></root>"
 
