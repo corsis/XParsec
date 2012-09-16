@@ -1,10 +1,10 @@
-**XParsec** can work with **any type**, supports **[domain-specific non-linear navigation](https://github.com/corsis/XParsec/blob/16de327b98410e3031636ffa86572e12d52f4594/XParsec.fsi#L88)** and is [**very easy to extend**](https://github.com/corsis/XParsec/blob/f6bc93499a588b287dc20f622fb917e1edac58b8/XParsec.fs#L111).
+**XParsec** can work with **any type**, supports **[domain-specific non-linear navigation](https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L88)** and is [**very easy to extend**](https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fs#102).
 
 (FParsec only works with `Char`s and can only go forward on a one dimensional string.)
 
 # Example
 
-Below we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/c79ce4ef4ec7401d1c0db8347fbfce6837078e44/XParsec.fsi#L61) – the first XParsec extension [implemented in just 19 lines of F#](https://github.com/corsis/XParsec/blob/c79ce4ef4ec7401d1c0db8347fbfce6837078e44/XParsec.fs#L102).
+Below we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L61) which provides the first XParsec extension [implemented in just 19 lines of F#](https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fs#L102).
 
 ```fsharp
   open XParsec
