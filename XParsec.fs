@@ -45,8 +45,8 @@ module Combinators =
 
   let inline attempt (p : Parser<_,_,_>)   (s : Source<_,_>) = let r,_ = p s in r,s
   let inline negate  (p : Parser<_,_,_>)    s                = let r,s = p s in Reply<_>.Negate   r,s
-  let inline (|->)   (p : Parser<_,_,_>) f  s                = let r,s = p s in Reply<_>.Map    f r,s
-  let inline (|?>)   (p : Parser<_,_,_>) f  s                = let r,s = p s in Reply<_>.Choose f r,s
+  let inline (=>)    (p : Parser<_,_,_>) f  s                = let r,s = p s in Reply<_>.Map    f r,s
+  let inline (?>)    (p : Parser<_,_,_>) f  s                = let r,s = p s in Reply<_>.Choose f r,s
 
   let inline (.> ) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> F,s | S p -> let r,s = q s in Reply<_>.Put p r,s
   let inline ( >.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> F,s | S _ -> q s

@@ -37,8 +37,8 @@ module Combinators =
 
   val inline attempt : Parser<'s,'a,'b> ->                      Parser<'s,'a,'b>
   val inline negate  : Parser<'s,'a,'b> ->                      Parser<'s,'a,unit>
-  val inline ( |-> ) : Parser<'s,'a,'b> -> ('b -> 'c)        -> Parser<'s,'a,'c>
-  val inline ( |?> ) : Parser<'s,'a,'b> -> ('b -> 'c option) -> Parser<'s,'a,'c>
+  val inline ( => )  : Parser<'s,'a,'b> -> ('b -> 'c)        -> Parser<'s,'a,'c>
+  val inline ( ?> )  : Parser<'s,'a,'b> -> ('b -> 'c option) -> Parser<'s,'a,'c>
 
   val inline ( .>  ) : Parser<'s,'a,'b> -> Parser<'s,'a,'c> -> Parser<'s,'a,'b>
   val inline (  >. ) : Parser<'s,'a,'b> -> Parser<'s,'a,'c> -> Parser<'s,'a,'c>
