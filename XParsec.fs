@@ -62,11 +62,11 @@ module Combinators =
   let inline array n    (p : Parser<_,_,_>) s = let r,s = s |> many p in Reply<_>.Choose (function l -> let a = l |> List.toArray in (a.Length = n) ?-> a) r,s
 
   let inline skipMany'  (p : Parser<_,_,_>) s =
-    let b = ref    Δ
-    let l = ref (Δ,s)
-    let c = ref  0
-    let q = Seq.toList <| seq { while (b := source !l; l := p !b; (reply !l).IsMatch) do c := !c + 1 }
-    S !c,!b
+    let mutable b =    Δ
+    let mutable l = (Δ,s)
+    let mutable c =  0
+    while (b <- source l; l <- p b; (reply l).IsMatch) do c <- c + 1
+    S c,b
   let inline skipMany1' (p : Parser<_,_,_>) s = let r,s = s |> skipMany'  p in Reply<_>.Choose (fun n -> if n > 0 then Some n  else None) r,s
   let inline skipN   i  (p : Parser<_,_,_>) s = let r,s = s |> skipMany'  p in Reply<_>.Choose (fun n -> if n = i then Some () else None) r,s
   let inline skipMany   (p : Parser<_,_,_>) s = let r,s = s |> skipMany'  p in Reply<_>.Put    ()                                         r,s
