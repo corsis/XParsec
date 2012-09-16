@@ -4,7 +4,7 @@
 
 # Example
 
-Below we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/c07865bcebfdaeb6eeb008804aaf33c4dbb400c8/XParsec.fsi#L61) – the first XParsec extension [implemented in just 19 lines of F#](https://github.com/corsis/XParsec/blob/c07865bcebfdaeb6eeb008804aaf33c4dbb400c8/XParsec.fs#L102).
+Below we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/c79ce4ef4ec7401d1c0db8347fbfce6837078e44/XParsec.fsi#L61) – the first XParsec extension [implemented in just 19 lines of F#](https://github.com/corsis/XParsec/blob/c79ce4ef4ec7401d1c0db8347fbfce6837078e44/XParsec.fs#L102).
 
 ```fsharp
   open XParsec
@@ -18,18 +18,17 @@ Below we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/c07865bcebfd
 
   let root1 = E.Parse "<root><a><b><c><d font='Arial'></d></c></b></a></root>"
 
-  //            navigation can be
-  //            domain-specific
-  //                  v
-  let parser1 = many (child|->name) .>. !@"font"
-  //            ^             ^
-  //       packed with      easy to
-  //       lots of          extend
-  //       combinators
+  //             domain-specific
+  //                navigation
+  //                    v
+  let parser1 = many (child => name) .>. !@"font"
+  //             ^              ^
+  //         powerful        first-class
+  //        combinators     extensibility
 
-  // choices are handled with grace
+  // graceful choices
   let parser2 = many child >. !@"font"
-  let parser3 = parent|->name </> parser2
+  let parser3 = parent => name </> parser2
 
   test root1 parser1; test root1 parser2; test root1 parser3
 ```
