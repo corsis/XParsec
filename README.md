@@ -7,6 +7,9 @@
 Here we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L61) which provides the first XParsec extension [implemented in just 19 lines of F#](https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fs#L102).
 
 ```fsharp
+  open XParsec
+  open XParsec.Xml
+
   let show reply = printfn "%A" reply
   let test parse = show << reply << parse << enter
   let name (e:E) = string e.Name                              // E = XElement
