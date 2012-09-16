@@ -36,14 +36,9 @@
 
 <p>Here we use <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fsi#L61"><code>XParsec.Xml</code></a> which provides the first XParsec extension <a href="https://github.com/corsis/XParsec/blob/0284b134a566ad2470d39a71fb94d7f4cbac0bdb/XParsec.fs#L102">implemented in just 19 lines of F#</a>.</p>
 
-<div class="highlight"><pre>  <span class="k">open</span> <span class="nc">XParsec</span>
-  <span class="k">open</span> <span class="nn">XParsec</span><span class="p">.</span><span class="nc">Xml</span>
-
-  <span class="k">let</span> <span class="n">show</span> <span class="n">reply</span> <span class="o">=</span> <span class="n">printfn</span> <span class="s2">"%A"</span> <span class="n">reply</span>
+<div class="highlight"><pre>  <span class="k">let</span> <span class="n">show</span> <span class="n">reply</span> <span class="o">=</span> <span class="n">printfn</span> <span class="s2">"%A"</span> <span class="n">reply</span>
   <span class="k">let</span> <span class="n">test</span> <span class="n">parse</span> <span class="o">=</span> <span class="n">show</span> <span class="o">&lt;&lt;</span> <span class="n">reply</span> <span class="o">&lt;&lt;</span> <span class="n">parse</span> <span class="o">&lt;&lt;</span> <span class="n">enter</span>
-  <span class="k">let</span> <span class="n">name</span> <span class="o">(</span><span class="n">e</span><span class="o">:</span><span class="nc">E</span><span class="o">)</span> <span class="o">=</span> <span class="kt">string</span> <span class="n">e</span><span class="o">.</span><span class="nc">Name</span>
-  <span class="c1">//          ^</span>
-  <span class="c1">//         XElement</span>
+  <span class="k">let</span> <span class="n">name</span> <span class="o">(</span><span class="n">e</span><span class="o">:</span><span class="nc">E</span><span class="o">)</span> <span class="o">=</span> <span class="kt">string</span> <span class="n">e</span><span class="o">.</span><span class="nc">Name</span>                              <span class="c1">// E = XElement</span>
 
   <span class="k">let</span> <span class="n">root</span> <span class="o">=</span> <span class="nn">E</span><span class="p">.</span><span class="nc">Parse</span> <span class="s2">"&lt;root&gt;&lt;a&gt;&lt;b&gt;&lt;c&gt;&lt;d font='Arial'&gt;&lt;/d&gt;&lt;/c&gt;&lt;/b&gt;&lt;/a&gt;&lt;/root&gt;"</span>
 
@@ -59,16 +54,22 @@
   <span class="k">let</span> <span class="n">parser2</span> <span class="o">=</span> <span class="o">!*</span><span class="n">child</span> <span class="o">&gt;.</span> <span class="o">!@</span><span class="s2">"font"</span>
   <span class="k">let</span> <span class="n">parser3</span> <span class="o">=</span>  <span class="n">parent</span> <span class="o">=&gt;</span> <span class="n">name</span> <span class="o">&lt;/&gt;</span> <span class="n">parser2</span>
 
-  <span class="c1">// graceful look-ahead</span>
+  <span class="c1">// graceful non-linear look-ahead (here = down in Xml)</span>
   <span class="k">let</span> <span class="n">parser4</span> <span class="o">=</span> <span class="n">attempt</span> <span class="n">parser1</span> <span class="o">.&gt;.</span> <span class="o">(</span><span class="n">current</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">)</span>
 
-  <span class="n">test</span> <span class="n">parser1</span> <span class="n">root</span><span class="o">;</span> <span class="n">test</span> <span class="n">parser2</span> <span class="n">root</span><span class="o">;</span> <span class="n">test</span> <span class="n">parser3</span> <span class="n">root</span><span class="o">;</span> <span class="n">test</span> <span class="n">parser4</span> <span class="n">root</span>
+  <span class="c1">// brand-new non-linear look-back (here = up   in Xml)</span>
+  <span class="k">let</span> <span class="nc">S</span> <span class="n">d</span><span class="o">,_</span>   <span class="o">=</span> <span class="n">enter</span> <span class="n">root</span> <span class="o">|&gt;</span> <span class="o">(!*</span><span class="n">child</span> <span class="o">&gt;.</span> <span class="n">current</span><span class="o">)</span>
+  <span class="k">let</span> <span class="n">parser5</span> <span class="o">=</span> <span class="n">attempt</span> <span class="o">&lt;|</span> <span class="n">many</span> <span class="o">(</span><span class="n">parent</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">)</span> <span class="o">.&gt;.</span> <span class="o">(</span><span class="n">current</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">)</span>
+
+  <span class="n">test</span> <span class="n">parser1</span> <span class="n">root</span><span class="o">;</span> <span class="n">test</span> <span class="n">parser2</span> <span class="n">root</span><span class="o">;</span> <span class="n">test</span> <span class="n">parser3</span> <span class="n">root</span>
+  <span class="n">test</span> <span class="n">parser4</span> <span class="n">root</span><span class="o">;</span> <span class="n">test</span> <span class="n">parser5</span> <span class="n">d</span>
 </pre></div>
 
 <div class="highlight"><pre><span class="nc">S</span> <span class="o">([</span><span class="s2">"a"</span><span class="o">;</span> <span class="s2">"b"</span><span class="o">;</span> <span class="s2">"c"</span><span class="o">;</span> <span class="s2">"d"</span><span class="o">],</span> <span class="s2">"Arial"</span><span class="o">)</span>
 <span class="nc">S</span> <span class="s2">"Arial"</span>
 <span class="nc">S</span> <span class="s2">"Arial"</span>
 <span class="nc">S</span> <span class="o">(([</span><span class="s2">"a"</span><span class="o">;</span> <span class="s2">"b"</span><span class="o">;</span> <span class="s2">"c"</span><span class="o">;</span> <span class="s2">"d"</span><span class="o">],</span> <span class="s2">"Arial"</span><span class="o">),</span> <span class="s2">"root"</span><span class="o">)</span>
+<span class="nc">S</span> <span class="o">([</span><span class="s2">"c"</span><span class="o">;</span> <span class="s2">"b"</span><span class="o">;</span> <span class="s2">"a"</span><span class="o">;</span> <span class="s2">"root"</span><span class="o">],</span> <span class="s2">"d"</span><span class="o">)</span>
 </pre></div>
 
 <h1>Browse</h1>
