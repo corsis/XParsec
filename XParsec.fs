@@ -110,8 +110,8 @@ module Xml =
   module Sources =
 
     type N = XNode
-    let inline next' (n:N) = let mutable c = Δ in (while (c <- n.NextNode;     match c with :? E as e -> true | _ -> false) do ()); match c with :? E as e -> e | _ -> Δ
-    let inline prev' (n:N) = let mutable c = Δ in (while (c <- n.PreviousNode; match c with :? E as e -> true | _ -> false) do ()); match c with :? E as e -> e | _ -> Δ
+    let inline next' (n:N) = let mutable c = Δ in (while (c <- n.NextNode;     match c with :? E -> true | _ -> false) do ()); match c with :? E as e -> e | _ -> Δ
+    let inline prev' (n:N) = let mutable c = Δ in (while (c <- n.PreviousNode; match c with :? E -> true | _ -> false) do ()); match c with :? E as e -> e | _ -> Δ
 
     type XElement with
       member inline     e.NextElement = next' e
