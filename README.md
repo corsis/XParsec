@@ -27,8 +27,8 @@ Below we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/c79ce4ef4ec7
   //        combinators     extensibility
 
   // graceful choices
-  let parser2 = many child >. !@"font"
-  let parser3 = parent => name </> parser2
+  let parser2 = !*child >. !@"font"
+  let parser3 =  parent => name </> parser2
 
   test root1 parser1; test root1 parser2; test root1 parser3
 ```
