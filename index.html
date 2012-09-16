@@ -56,8 +56,8 @@
   <span class="c1">//        combinators     extensibility</span>
 
   <span class="c1">// graceful choices</span>
-  <span class="k">let</span> <span class="n">parser2</span> <span class="o">=</span> <span class="n">many</span> <span class="n">child</span> <span class="o">&gt;.</span> <span class="o">!@</span><span class="s2">"font"</span>
-  <span class="k">let</span> <span class="n">parser3</span> <span class="o">=</span> <span class="n">parent</span> <span class="o">=&gt;</span> <span class="n">name</span> <span class="o">&lt;/&gt;</span> <span class="n">parser2</span>
+  <span class="k">let</span> <span class="n">parser2</span> <span class="o">=</span> <span class="o">!*</span><span class="n">child</span> <span class="o">&gt;.</span> <span class="o">!@</span><span class="s2">"font"</span>
+  <span class="k">let</span> <span class="n">parser3</span> <span class="o">=</span>  <span class="n">parent</span> <span class="o">=&gt;</span> <span class="n">name</span> <span class="o">&lt;/&gt;</span> <span class="n">parser2</span>
 
   <span class="n">test</span> <span class="n">root1</span> <span class="n">parser1</span><span class="o">;</span> <span class="n">test</span> <span class="n">root1</span> <span class="n">parser2</span><span class="o">;</span> <span class="n">test</span> <span class="n">root1</span> <span class="n">parser3</span>
 </pre></div>
