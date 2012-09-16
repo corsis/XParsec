@@ -1,15 +1,40 @@
 # Example
 
 ```
-open XParsec
-open XParsec.Xml
+  open XParsec
+  open XParsec.Xml
 
-let s = AE.New [| E.Parse "<span font='Bold' />"; E.Parse "<span t='(' />" |]
-let r = next >. !@"font"|->String.length .> "font"@~?"B" .>. next .> !@+"t" <| s
+  let show x = printfn "%A" x
+
+  let test root parse = root |> enter |> parse |> show
+
+  let name (e : E) = string e.Name     // easy to extend
+
+  //
+
+  let root1 = E.Parse "<root><a><b><c><d font='DeepDescent'></d></c></b></a></root>"
+
+  //            navigation can be
+  //            domain-specific
+  //                  v
+  let parser1 = many (child|->name) >. !@"font"
+  //            ^             ^
+  //       packed with      easy to
+  //       lots of          extend
+  //       combinators
+
+  test root1 parser1
+
+  //
+
+  let parser2 = parent|->name </> parser1
+
+  test root1 parser2
 ```
 
 ```
-val r : (int * E) Reply = S (4, <span t="(" />)
+(S "DeepDescent", XParsec+Source`2[System.Xml.Linq.XElement,System.Xml.Linq.XElement])
+(S "DeepDescent", XParsec+Source`2[System.Xml.Linq.XElement,System.Xml.Linq.XElement])
 ```
 
 # Browse
