@@ -7,7 +7,6 @@
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <link rel="shortcut icon" href="http://fusion.corsis.eu/i/icon/favicon_32x32.ico">
     <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
@@ -19,12 +18,12 @@
     <div class="wrapper">
       <header>
         <h1>XParsec</h1>
-        <p>extensible, type-and-source-polymorphic, non-linear applicative parser combinator library for F# 3.0</p>
+        <p>an extensible, type-and-source-polymorphic, non-linear applicative parser combinator library in F# 3.0</p>
         <p class="view"><a href="https://github.com/corsis/XParsec">View the Project on GitHub <small>corsis/XParsec</small></a></p>
         <ul>
-          <li><a href="https://github.com/corsis/XParsec">View On <strong>GitHub</strong></a></li>
           <li><a href="https://github.com/corsis/XParsec/zipball/master">Download <strong>ZIP File</strong></a></li>
           <li><a href="https://github.com/corsis/XParsec/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/corsis/XParsec">View On <strong>GitHub</strong></a></li>
         </ul>
       </header>
       <section>
@@ -32,7 +31,7 @@
 
 <p>(FParsec only works with <code>Char</code>s and can only go forward on a one dimensional <code>String</code>.)</p>
 
-<h1>Example</h1>
+<h1>Example 1</h1>
 
 <p>Here we use <a href="https://github.com/corsis/XParsec/blob/9d0b8c0b96c4e1796e7f04e536629ae96c423352/XParsec.fsi#L61"><code>XParsec.Xml</code></a> which provides the first XParsec extension <a href="https://github.com/corsis/XParsec/blob/9d0b8c0b96c4e1796e7f04e536629ae96c423352/XParsec.fs#L102">implemented in just 19 lines of F#</a>.</p>
 
@@ -60,7 +59,7 @@
 
   <span class="c1">// brand-new non-linear look-back (here = up   in Xml)</span>
   <span class="k">let</span> <span class="nc">S</span> <span class="n">d</span><span class="o">,_</span>   <span class="o">=</span> <span class="n">enter</span> <span class="n">root</span> <span class="o">|&gt;</span> <span class="o">(!*</span><span class="n">child</span> <span class="o">&gt;.</span> <span class="n">current</span><span class="o">)</span>
-  <span class="k">let</span> <span class="n">parser4</span> <span class="o">=</span> <span class="o">(</span><span class="n">attempt</span> <span class="o">&lt;|</span> <span class="n">many</span> <span class="o">(</span><span class="n">parent</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">)</span><span class="o">)</span> <span class="o">.&gt;.</span> <span class="o">(</span><span class="n">current</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">)</span>
+  <span class="k">let</span> <span class="n">parser4</span> <span class="o">=</span> <span class="o">(</span><span class="n">attempt</span> <span class="o">&lt;|</span> <span class="n">many</span> <span class="o">(</span><span class="n">parent</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">))</span> <span class="o">.&gt;.</span> <span class="o">(</span><span class="n">current</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">)</span>
 
   <span class="n">test</span> <span class="n">parser1</span> <span class="n">root</span><span class="o">;</span> <span class="n">test</span> <span class="n">parser2</span> <span class="n">root</span><span class="o">;</span> <span class="n">test</span> <span class="n">parser3</span> <span class="n">root</span><span class="o">;</span> <span class="n">test</span> <span class="n">parser4</span> <span class="n">d</span>
 </pre></div>
@@ -69,6 +68,43 @@
 <span class="nc">S</span> <span class="s2">"Arial"</span>
 <span class="nc">S</span> <span class="o">(([</span><span class="s2">"a"</span><span class="o">;</span> <span class="s2">"b"</span><span class="o">;</span> <span class="s2">"c"</span><span class="o">;</span> <span class="s2">"d"</span><span class="o">],</span> <span class="s2">"Arial"</span><span class="o">),</span> <span class="s2">"root"</span><span class="o">)</span>
 <span class="nc">S</span> <span class="o">([</span><span class="s2">"c"</span><span class="o">;</span> <span class="s2">"b"</span><span class="o">;</span> <span class="s2">"a"</span><span class="o">;</span> <span class="s2">"root"</span><span class="o">],</span> <span class="s2">"d"</span><span class="o">)</span>
+</pre></div>
+
+<h1>Example 2</h1>
+
+<p>Recursion – handled with ease.</p>
+
+<div class="highlight"><pre><span class="k">open</span> <span class="nc">XParsec</span>
+<span class="k">open</span> <span class="nn">XParsec</span><span class="p">.</span><span class="nc">Xml</span>
+
+<span class="k">type</span> <span class="nc">Xobj</span> <span class="o">=</span> <span class="nc">I</span> <span class="k">of</span> <span class="kt">int</span> <span class="o">|</span> <span class="nc">L</span> <span class="k">of</span> <span class="nc">Xobj</span> <span class="kt">list</span>
+
+<span class="k">let</span> <span class="n">main</span> <span class="o">_</span> <span class="o">=</span>
+
+  <span class="k">let</span> <span class="n">root</span> <span class="o">=</span> <span class="nn">E</span><span class="p">.</span><span class="nc">Parse</span> <span class="s2">"&lt;list&gt;&lt;int v='1'/&gt;&lt;list&gt;&lt;int v='2'/&gt;&lt;/list&gt;&lt;int v='1'/&gt;&lt;/list&gt;"</span>
+
+  <span class="k">let</span> <span class="o">(!&lt;&gt;)</span> <span class="n">n</span> <span class="o">=</span>  <span class="n">current</span> <span class="o">?&gt;</span> <span class="k">fun</span> <span class="o">(</span><span class="n">e</span><span class="o">:</span><span class="nc">E</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="nc">Name</span> <span class="o">=</span> <span class="o">!&gt;</span> <span class="n">n</span><span class="o">)</span> <span class="o">?-&gt;</span> <span class="n">e</span>
+  <span class="k">let</span> <span class="n">all</span>   <span class="n">p</span> <span class="o">=</span> <span class="o">(</span><span class="n">current</span> <span class="o">&gt;.</span> <span class="n">p</span><span class="o">)</span> <span class="o">.&gt;.</span> <span class="n">many</span> <span class="o">(</span><span class="n">next</span> <span class="o">&gt;.</span> <span class="n">p</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="k">function</span> <span class="n">c</span><span class="o">,</span><span class="n">cs</span> <span class="o">-&gt;</span> <span class="n">c</span><span class="o">::</span><span class="n">cs</span>
+
+  <span class="k">let</span> <span class="n">e</span><span class="o">,</span><span class="n">e'</span>    <span class="o">=</span> <span class="n">future</span> <span class="bp">()</span>
+
+  <span class="k">let</span> <span class="n">int_</span>    <span class="o">=</span> <span class="o">!&lt;&gt;</span><span class="s2">"int"</span>  <span class="o">&gt;.</span> <span class="o">!@</span><span class="s2">"v"</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="nn">Int32</span><span class="p">.</span><span class="nc">Parse</span> <span class="o">&gt;&gt;</span> <span class="nc">I</span><span class="o">)</span>
+  <span class="k">let</span> <span class="kt">list</span>    <span class="o">=</span> <span class="o">!&lt;&gt;</span><span class="s2">"list"</span> <span class="o">&gt;.</span> <span class="n">child</span> <span class="o">&gt;.</span> <span class="n">all</span> <span class="n">e</span> <span class="o">.&gt;</span> <span class="n">parent</span> <span class="o">=&gt;</span> <span class="nc">L</span>
+
+  <span class="k">do</span>  <span class="n">e'</span>     <span class="o">:=</span> <span class="n">int_</span> <span class="o">&lt;/&gt;</span> <span class="kt">list</span>
+
+  <span class="n">test</span> <span class="n">e</span> <span class="n">root</span>
+</pre></div>
+
+<div class="highlight"><pre><span class="nc">S</span> <span class="o">(</span><span class="nc">L</span> <span class="o">[</span><span class="nc">I</span> <span class="mi">1</span><span class="o">;</span> <span class="nc">L</span> <span class="o">[</span><span class="nc">I</span> <span class="mi">2</span><span class="o">];</span> <span class="nc">I</span> <span class="mi">1</span><span class="o">])</span>
+</pre></div>
+
+<p>It is important to note that you are in full control of navigation at all times!</p>
+
+<div class="highlight"><pre>  <span class="k">let</span> <span class="kt">list</span>    <span class="o">=</span> <span class="o">!&lt;&gt;</span><span class="s2">"list"</span> <span class="o">&gt;.</span> <span class="n">child</span> <span class="o">&gt;.</span> <span class="n">all</span> <span class="n">e</span> <span class="o">=&gt;</span> <span class="nc">L</span>
+</pre></div>
+
+<div class="highlight"><pre><span class="nc">S</span> <span class="o">(</span><span class="nc">L</span> <span class="o">[</span><span class="nc">I</span> <span class="mi">1</span><span class="o">;</span> <span class="nc">L</span> <span class="o">[</span><span class="nc">I</span> <span class="mi">2</span><span class="o">])</span>
 </pre></div>
 
 <h1>Browse</h1>
