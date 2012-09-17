@@ -31,7 +31,7 @@ Here we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/9d0b8c0b96c4e
 
   // brand-new non-linear look-back (here = up   in Xml)
   let S d,_   = enter root |> (!*child >. current)
-  let parser4 = attempt <| many (parent => name) .>. (current => name)
+  let parser4 = (attempt <| many (parent => name)) .>. (current => name)
 
   test parser1 root; test parser2 root; test parser3 root; test parser4 d
 ```
