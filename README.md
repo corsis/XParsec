@@ -54,7 +54,7 @@ type Xobj = I of int | L of Xobj list
 
 let main _ =
 
-  let root = E.Parse "<list><int v='1' /><list><int v='2' /></list><int v='1' /></list>"
+  let root = E.Parse "<list><int v='1'/><list><int v='2'/></list><int v='1'/></list>"
 
   let (!<>) n =  current ?> fun (e:E) -> (e.Name = !> n) ?-> e
   let all   p = (current >. p) .>. many (next >. p) => function c,cs -> c::cs
