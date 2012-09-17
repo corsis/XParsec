@@ -43,6 +43,7 @@ module Combinators =
 
   let inline current (s : Source<_,_>) = S <| s.Current,s
 
+  let inline future  () = let r = ref Δ in (fun s-> !r s), r : Parser<_,_,_> * Parser<_,_,_> ref
   let inline attempt (p : Parser<_,_,_>)   s = let r,_ = p s in r,s
   let inline negate  (p : Parser<_,_,_>)   s = let r,s = p s in Reply<_>.Negate   r,s
   let inline (=>)    (p : Parser<_,_,_>) f s = let r,s = p s in Reply<_>.Map    f r,s
@@ -60,7 +61,6 @@ module Combinators =
     S q,!b
   let inline many1      (p : Parser<_,_,_>) s = let r,s = s |> many p in Reply<_>.Choose (function _::_ as l -> Some l | _ -> None)                        r,s
   let inline array n    (p : Parser<_,_,_>) s = let r,s = s |> many p in Reply<_>.Choose (function l -> let a = l |> List.toArray in (a.Length = n) ?-> a) r,s
-
   let inline skipMany'  (p : Parser<_,_,_>) s =
     let mutable b =    Δ
     let mutable l = (Δ,s)
@@ -110,8 +110,8 @@ module Xml =
   module Sources =
 
     type N = XNode
-    let inline next' (n:N) = let mutable c = Δ in (while (c <- n.NextNode;     match c with :? E -> true | _ -> false) do ()); match c with :? E as e -> e | _ -> Δ
-    let inline prev' (n:N) = let mutable c = Δ in (while (c <- n.PreviousNode; match c with :? E -> true | _ -> false) do ()); match c with :? E as e -> e | _ -> Δ
+    let inline next' (n:N) = let mutable c = n in (while (c <- c.NextNode;     match c with :? E | null -> false | _ -> true) do ()); match c with :? E as e -> e | _ -> Δ
+    let inline prev' (n:N) = let mutable c = n in (while (c <- c.PreviousNode; match c with :? E | null -> false | _ -> true) do ()); match c with :? E as e -> e | _ -> Δ
 
     type XElement with
       member inline     e.NextElement = next' e
