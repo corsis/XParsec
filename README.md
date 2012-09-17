@@ -44,6 +44,8 @@ S (["c"; "b"; "a"; "root"], "d")
 
 # Example 2
 
+Recursion &ndash; handled with ease.
+
 ```fsharp
 open XParsec
 open XParsec.Xml
@@ -52,15 +54,7 @@ type Xobj = I of int | L of Xobj list
 
 let main _ =
 
-  let root = E.Parse """
-    <list>
-      <int v='1' />
-      <list>
-        <int v='2' />
-      </list>
-      <int v='1' />
-    </list>
-  """
+  let root = E.Parse "<list><int v='1' /><list><int v='2' /></list><int v='1' /></list>"
 
   let (!<>) n =  current ?> fun (e:E) -> (e.Name = !> n) ?-> e
   let all   p = (current >. p) .>. many (next >. p) => function c,cs -> c::cs
@@ -78,7 +72,7 @@ let main _ =
 S (L [I 1; L [I 2]; I 1])
 ```
 
-You are in full control of navigation at all times:
+It is important to note that you are in full control of navigation at all times!
 
 ```fsharp
   let list    = !<>"list" >. child >. all e => L
@@ -86,7 +80,6 @@ You are in full control of navigation at all times:
 ```fsharp
 S (L [I 1; L [I 2])
 ```
-
 
 # Browse
 
