@@ -4,7 +4,7 @@
 
 # Example 1
 
-Here we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L61) which provides the first XParsec extension. It is **implemented in just 14 source lines of code** for the examples used below.
+Here we use **[`XParsec.Xml`](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L61)** which provides the first XParsec extension. It is **implemented in just 14 source lines of code** for the examples used below.
 
 ```fsharp
   open XParsec
