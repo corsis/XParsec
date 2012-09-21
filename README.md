@@ -57,12 +57,12 @@ let main _ =
 
   let root = E.Parse "<list><int v='1'/><list><int v='2'/></list><int v='3'/></list>"
 
-  let e,e'    = future ()
+  let e,e' = future ()
 
-  let int_    = !<>"int"  >. !@"v"      => (Int32.Parse >> I)
-  let list    = !<>"list" >. children e =>                 L
+  let int_ = !<>"int"  >. !@"v"      => (Int32.Parse >> I)
+  let list = !<>"list" >. children e =>                 L
 
-  do  e'     := int_ </> list
+  do  e'  := int_ </> list
 
   test e root
 ```
