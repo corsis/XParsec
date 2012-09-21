@@ -7,8 +7,10 @@
 **[XParsec.Xml](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L61)** is the first XParsec extension. It is **implemented in just 14 source lines of code** for the examples used below and provides complete freedom in navigating XML trees.
 
 ```fsharp
-  open XParsec
-  open XParsec.Xml
+open XParsec
+open XParsec.Xml
+
+let main _ =
 
   let test parse = printfn "%A" << reply << parse << E.source
 
@@ -46,10 +48,12 @@ S (["c"; "b"; "a"; "root"], "d")
 Recursion &ndash; handled with ease.
 
 ```fsharp
-  open XParsec
-  open XParsec.Xml
+open XParsec
+open XParsec.Xml
 
-  type Xobj  = I of int | L of Xobj list
+type Xobj  = I of int | L of Xobj list
+
+let main _ =
 
   let root = E.Parse "<list><int v='1'/><list><int v='2'/></list><int v='3'/></list>"
 
