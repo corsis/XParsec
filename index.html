@@ -84,12 +84,12 @@
 
   <span class="k">let</span> <span class="n">root</span> <span class="o">=</span> <span class="nn">E</span><span class="p">.</span><span class="nc">Parse</span> <span class="s2">"&lt;list&gt;&lt;int v='1'/&gt;&lt;list&gt;&lt;int v='2'/&gt;&lt;/list&gt;&lt;int v='3'/&gt;&lt;/list&gt;"</span>
 
-  <span class="k">let</span> <span class="n">e</span><span class="o">,</span><span class="n">e'</span>    <span class="o">=</span> <span class="n">future</span> <span class="bp">()</span>
+  <span class="k">let</span> <span class="n">e</span><span class="o">,</span><span class="n">e'</span> <span class="o">=</span> <span class="n">future</span> <span class="bp">()</span>
 
-  <span class="k">let</span> <span class="n">int_</span>    <span class="o">=</span> <span class="o">!&lt;&gt;</span><span class="s2">"int"</span>  <span class="o">&gt;.</span> <span class="o">!@</span><span class="s2">"v"</span>      <span class="o">=&gt;</span> <span class="o">(</span><span class="nn">Int32</span><span class="p">.</span><span class="nc">Parse</span> <span class="o">&gt;&gt;</span> <span class="nc">I</span><span class="o">)</span>
-  <span class="k">let</span> <span class="kt">list</span>    <span class="o">=</span> <span class="o">!&lt;&gt;</span><span class="s2">"list"</span> <span class="o">&gt;.</span> <span class="n">children</span> <span class="n">e</span> <span class="o">=&gt;</span>                 <span class="nc">L</span>
+  <span class="k">let</span> <span class="n">int_</span> <span class="o">=</span> <span class="o">!&lt;&gt;</span><span class="s2">"int"</span>  <span class="o">&gt;.</span> <span class="o">!@</span><span class="s2">"v"</span>      <span class="o">=&gt;</span> <span class="o">(</span><span class="nn">Int32</span><span class="p">.</span><span class="nc">Parse</span> <span class="o">&gt;&gt;</span> <span class="nc">I</span><span class="o">)</span>
+  <span class="k">let</span> <span class="kt">list</span> <span class="o">=</span> <span class="o">!&lt;&gt;</span><span class="s2">"list"</span> <span class="o">&gt;.</span> <span class="n">children</span> <span class="n">e</span> <span class="o">=&gt;</span>                 <span class="nc">L</span>
 
-  <span class="k">do</span>  <span class="n">e'</span>     <span class="o">:=</span> <span class="n">int_</span> <span class="o">&lt;/&gt;</span> <span class="kt">list</span>
+  <span class="k">do</span>  <span class="n">e'</span>  <span class="o">:=</span> <span class="n">int_</span> <span class="o">&lt;/&gt;</span> <span class="kt">list</span>
 
   <span class="n">test</span> <span class="n">e</span> <span class="n">root</span>
 </pre></div>
