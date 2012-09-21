@@ -1,10 +1,10 @@
-**XParsec** works with **[any type](https://github.com/corsis/XParsec/blob/9d0b8c0b96c4e1796e7f04e536629ae96c423352/XParsec.fsi#L26)**, is **[very easy to extend](https://github.com/corsis/XParsec/blob/9d0b8c0b96c4e1796e7f04e536629ae96c423352/XParsec.fs#L102)**, supports **[domain-specific non-linear navigation](https://github.com/corsis/XParsec/blob/9d0b8c0b96c4e1796e7f04e536629ae96c423352/XParsec.fsi#L88)**.
+**XParsec** works with **[any type](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L26)**, is **[very easy to extend](https://github.com/corsis/XParsec/blob/master/XParsec.fs#L102)**, supports **[domain-specific non-linear navigation](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L88)** and is **implemented in just 50 source lines of code**.
 
 (FParsec only works with `Char`s and can only go forward on a one dimensional `String`.)
 
-# Example
+# Example 1
 
-Here we use [`XParsec.Xml`](https://github.com/corsis/XParsec/blob/9d0b8c0b96c4e1796e7f04e536629ae96c423352/XParsec.fsi#L61) which provides the first XParsec extension [implemented in just 19 lines of F#](https://github.com/corsis/XParsec/blob/9d0b8c0b96c4e1796e7f04e536629ae96c423352/XParsec.fs#L102).
+**[XParsec.Xml](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L61)** is the first XParsec extension. It is **implemented in just 14 source lines of code** for the examples used below and provides complete freedom in navigating XML trees.
 
 ```fsharp
   open XParsec
@@ -40,6 +40,45 @@ S (["a"; "b"; "c"; "d"], "Arial")
 S "Arial"
 S ((["a"; "b"; "c"; "d"], "Arial"), "root")
 S (["c"; "b"; "a"; "root"], "d")
+```
+
+# Example 2
+
+Recursion &ndash; handled with ease.
+
+```fsharp
+open XParsec
+open XParsec.Xml
+
+type Xobj = I of int | L of Xobj list
+
+let main _ =
+
+  let root = E.Parse "<list><int v='1'/><list><int v='2'/></list><int v='3'/></list>"
+
+  let (!<>) n =  current ?> fun (e:E) -> (e.Name = !> n) ?-> e
+  let all   p = (current >. p) .>. many (next >. p) => function c,cs -> c::cs
+
+  let e,e'    = future ()
+
+  let int_    = !<>"int"  >. !@"v" => (Int32.Parse >> I)
+  let list    = !<>"list" >. child >. all e .> parent => L
+
+  do  e'     := int_ </> list
+
+  test e root
+```
+```fsharp
+S (L [I 1; L [I 2]; I 3])
+```
+
+It is important to note that you are in full control of navigation at all times!
+
+```fsharp
+  let list    = !<>"list" >. child >. all e => L
+```
+```fsharp
+S (L [I 1; L [I 2])
 ```
 
 # Browse
