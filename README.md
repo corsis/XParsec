@@ -7,31 +7,32 @@
 **[XParsec.Xml](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L61)** is the first XParsec extension. It is **implemented in just 14 source lines of code** for the examples used below and provides complete freedom in navigating XML trees.
 
 ```fsharp
-  open XParsec
-  open XParsec.Xml
+open XParsec
+open XParsec.Xml
 
-  let test parse = printfn "%A" << reply << parse << enter
-  let name (e:E) = string e.Name                              // E = XElement
+let main _ =
+
+  let test parse = printfn "%A" << reply << parse << E.source
 
   let root = E.Parse "<root><a><b><c><d font='Arial'></d></c></b></a></root>"
 
-  //             domain-specific
-  //                navigation
-  //                    v
+  //            domain-specific
+  //              navigation
+  //                  v
   let parser1 = many (child => name) .>. !@"font"
-  //             ^              ^
-  //         powerful        first-class
-  //        combinators     extensibility
+  //            ^           ^
+  //         powerful     first-class
+  //      combinators     extensibility
 
   // graceful choices
   let parser2 = (parent => name) </> (!*child >. !@"font")
 
   // graceful non-linear look-ahead (here = down in Xml)
-  let parser3 = attempt parser1 .>. (current => name)
+  let parser3 = ahead parser1 .>. (current => name)
 
   // brand-new non-linear look-back (here = up   in Xml)
-  let S d,_   = enter root |> (!*child >. current)
-  let parser4 = (attempt <| many (parent => name)) .>. (current => name)
+  let S d,_   = E.source root |> (!*child >. current)
+  let parser4 = (ahead <| many (parent => name)) .>. (current => name)
 
   test parser1 root; test parser2 root; test parser3 root; test parser4 d
 ```
@@ -50,19 +51,16 @@ Recursion &ndash; handled with ease.
 open XParsec
 open XParsec.Xml
 
-type Xobj = I of int | L of Xobj list
+type Xobj  = I of int | L of Xobj list
 
 let main _ =
 
-  let root = E.Parse "<list><int v='1'/><list><int v='2'/></list><int v='3'/></list>"
-
-  let (!<>) n =  current ?> fun (e:E) -> (e.Name = !> n) ?-> e
-  let all   p = (current >. p) .>. many (next >. p) => function c,cs -> c::cs
+  let root = E.Parse "<list><int v='1' /><list><int v='2' /></list><int v='3' /></list>"
 
   let e,e'    = future ()
 
-  let int_    = !<>"int"  >. !@"v" => (Int32.Parse >> I)
-  let list    = !<>"list" >. child >. all e .> parent => L
+  let int_    = !<>"int"  >. !@"v"      => (Int32.Parse >> I)
+  let list    = !<>"list" >. children e =>                 L
 
   do  e'     := int_ </> list
 
@@ -70,15 +68,6 @@ let main _ =
 ```
 ```fsharp
 S (L [I 1; L [I 2]; I 3])
-```
-
-It is important to note that you are in full control of navigation at all times!
-
-```fsharp
-  let list    = !<>"list" >. child >. all e => L
-```
-```fsharp
-S (L [I 1; L [I 2])
 ```
 
 # Browse
