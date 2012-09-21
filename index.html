@@ -31,35 +31,36 @@
 
 <p>(FParsec only works with <code>Char</code>s and can only go forward on a one dimensional <code>String</code>.)</p>
 
-<h1 id="ex1">Example 1</h1>
+<h1>Example 1</h1>
 
 <p><strong><a href="https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L61">XParsec.Xml</a></strong> is the first XParsec extension. It is <strong>implemented in just 14 source lines of code</strong> for the examples used below and provides complete freedom in navigating XML trees.</p>
 
-<div class="highlight"><pre>  <span class="k">open</span> <span class="nc">XParsec</span>
-  <span class="k">open</span> <span class="nn">XParsec</span><span class="p">.</span><span class="nc">Xml</span>
+<div class="highlight"><pre><span class="k">open</span> <span class="nc">XParsec</span>
+<span class="k">open</span> <span class="nn">XParsec</span><span class="p">.</span><span class="nc">Xml</span>
 
-  <span class="k">let</span> <span class="n">test</span> <span class="n">parse</span> <span class="o">=</span> <span class="n">printfn</span> <span class="s2">"%A"</span> <span class="o">&lt;&lt;</span> <span class="n">reply</span> <span class="o">&lt;&lt;</span> <span class="n">parse</span> <span class="o">&lt;&lt;</span> <span class="n">enter</span>
-  <span class="k">let</span> <span class="n">name</span> <span class="o">(</span><span class="n">e</span><span class="o">:</span><span class="nc">E</span><span class="o">)</span> <span class="o">=</span> <span class="kt">string</span> <span class="n">e</span><span class="o">.</span><span class="nc">Name</span>                              <span class="c1">// E = XElement</span>
+<span class="k">let</span> <span class="n">main</span> <span class="o">_</span> <span class="o">=</span>
+
+  <span class="k">let</span> <span class="n">test</span> <span class="n">parse</span> <span class="o">=</span> <span class="n">printfn</span> <span class="s2">"%A"</span> <span class="o">&lt;&lt;</span> <span class="n">reply</span> <span class="o">&lt;&lt;</span> <span class="n">parse</span> <span class="o">&lt;&lt;</span> <span class="nn">E</span><span class="p">.</span><span class="n">source</span>
 
   <span class="k">let</span> <span class="n">root</span> <span class="o">=</span> <span class="nn">E</span><span class="p">.</span><span class="nc">Parse</span> <span class="s2">"&lt;root&gt;&lt;a&gt;&lt;b&gt;&lt;c&gt;&lt;d font='Arial'&gt;&lt;/d&gt;&lt;/c&gt;&lt;/b&gt;&lt;/a&gt;&lt;/root&gt;"</span>
 
-  <span class="c1">//             domain-specific</span>
-  <span class="c1">//                navigation</span>
-  <span class="c1">//                    v</span>
+  <span class="c1">//            domain-specific</span>
+  <span class="c1">//              navigation</span>
+  <span class="c1">//                  v</span>
   <span class="k">let</span> <span class="n">parser1</span> <span class="o">=</span> <span class="n">many</span> <span class="o">(</span><span class="n">child</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">)</span> <span class="o">.&gt;.</span> <span class="o">!@</span><span class="s2">"font"</span>
-  <span class="c1">//             ^              ^</span>
-  <span class="c1">//         powerful        first-class</span>
-  <span class="c1">//        combinators     extensibility</span>
+  <span class="c1">//            ^           ^</span>
+  <span class="c1">//         powerful     first-class</span>
+  <span class="c1">//      combinators     extensibility</span>
 
   <span class="c1">// graceful choices</span>
   <span class="k">let</span> <span class="n">parser2</span> <span class="o">=</span> <span class="o">(</span><span class="n">parent</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">)</span> <span class="o">&lt;/&gt;</span> <span class="o">(!*</span><span class="n">child</span> <span class="o">&gt;.</span> <span class="o">!@</span><span class="s2">"font"</span><span class="o">)</span>
 
   <span class="c1">// graceful non-linear look-ahead (here = down in Xml)</span>
-  <span class="k">let</span> <span class="n">parser3</span> <span class="o">=</span> <span class="n">attempt</span> <span class="n">parser1</span> <span class="o">.&gt;.</span> <span class="o">(</span><span class="n">current</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">)</span>
+  <span class="k">let</span> <span class="n">parser3</span> <span class="o">=</span> <span class="n">ahead</span> <span class="n">parser1</span> <span class="o">.&gt;.</span> <span class="o">(</span><span class="n">current</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">)</span>
 
   <span class="c1">// brand-new non-linear look-back (here = up   in Xml)</span>
-  <span class="k">let</span> <span class="nc">S</span> <span class="n">d</span><span class="o">,_</span>   <span class="o">=</span> <span class="n">enter</span> <span class="n">root</span> <span class="o">|&gt;</span> <span class="o">(!*</span><span class="n">child</span> <span class="o">&gt;.</span> <span class="n">current</span><span class="o">)</span>
-  <span class="k">let</span> <span class="n">parser4</span> <span class="o">=</span> <span class="o">(</span><span class="n">attempt</span> <span class="o">&lt;|</span> <span class="n">many</span> <span class="o">(</span><span class="n">parent</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">))</span> <span class="o">.&gt;.</span> <span class="o">(</span><span class="n">current</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">)</span>
+  <span class="k">let</span> <span class="nc">S</span> <span class="n">d</span><span class="o">,_</span>   <span class="o">=</span> <span class="nn">E</span><span class="p">.</span><span class="n">source</span> <span class="n">root</span> <span class="o">|&gt;</span> <span class="o">(!*</span><span class="n">child</span> <span class="o">&gt;.</span> <span class="n">current</span><span class="o">)</span>
+  <span class="k">let</span> <span class="n">parser4</span> <span class="o">=</span> <span class="o">(</span><span class="n">ahead</span> <span class="o">&lt;|</span> <span class="n">many</span> <span class="o">(</span><span class="n">parent</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">))</span> <span class="o">.&gt;.</span> <span class="o">(</span><span class="n">current</span> <span class="o">=&gt;</span> <span class="n">name</span><span class="o">)</span>
 
   <span class="n">test</span> <span class="n">parser1</span> <span class="n">root</span><span class="o">;</span> <span class="n">test</span> <span class="n">parser2</span> <span class="n">root</span><span class="o">;</span> <span class="n">test</span> <span class="n">parser3</span> <span class="n">root</span><span class="o">;</span> <span class="n">test</span> <span class="n">parser4</span> <span class="n">d</span>
 </pre></div>
@@ -70,26 +71,23 @@
 <span class="nc">S</span> <span class="o">([</span><span class="s2">"c"</span><span class="o">;</span> <span class="s2">"b"</span><span class="o">;</span> <span class="s2">"a"</span><span class="o">;</span> <span class="s2">"root"</span><span class="o">],</span> <span class="s2">"d"</span><span class="o">)</span>
 </pre></div>
 
-<h1 id="ex2">Example 2</h1>
+<h1>Example 2</h1>
 
 <p>Recursion – handled with ease.</p>
 
 <div class="highlight"><pre><span class="k">open</span> <span class="nc">XParsec</span>
 <span class="k">open</span> <span class="nn">XParsec</span><span class="p">.</span><span class="nc">Xml</span>
 
-<span class="k">type</span> <span class="nc">Xobj</span> <span class="o">=</span> <span class="nc">I</span> <span class="k">of</span> <span class="kt">int</span> <span class="o">|</span> <span class="nc">L</span> <span class="k">of</span> <span class="nc">Xobj</span> <span class="kt">list</span>
+<span class="k">type</span> <span class="nc">Xobj</span>  <span class="o">=</span> <span class="nc">I</span> <span class="k">of</span> <span class="kt">int</span> <span class="o">|</span> <span class="nc">L</span> <span class="k">of</span> <span class="nc">Xobj</span> <span class="kt">list</span>
 
 <span class="k">let</span> <span class="n">main</span> <span class="o">_</span> <span class="o">=</span>
 
-  <span class="k">let</span> <span class="n">root</span> <span class="o">=</span> <span class="nn">E</span><span class="p">.</span><span class="nc">Parse</span> <span class="s2">"&lt;list&gt;&lt;int v='1'/&gt;&lt;list&gt;&lt;int v='2'/&gt;&lt;/list&gt;&lt;int v='3'/&gt;&lt;/list&gt;"</span>
-
-  <span class="k">let</span> <span class="o">(!&lt;&gt;)</span> <span class="n">n</span> <span class="o">=</span>  <span class="n">current</span> <span class="o">?&gt;</span> <span class="k">fun</span> <span class="o">(</span><span class="n">e</span><span class="o">:</span><span class="nc">E</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="nc">Name</span> <span class="o">=</span> <span class="o">!&gt;</span> <span class="n">n</span><span class="o">)</span> <span class="o">?-&gt;</span> <span class="n">e</span>
-  <span class="k">let</span> <span class="n">all</span>   <span class="n">p</span> <span class="o">=</span> <span class="o">(</span><span class="n">current</span> <span class="o">&gt;.</span> <span class="n">p</span><span class="o">)</span> <span class="o">.&gt;.</span> <span class="n">many</span> <span class="o">(</span><span class="n">next</span> <span class="o">&gt;.</span> <span class="n">p</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="k">function</span> <span class="n">c</span><span class="o">,</span><span class="n">cs</span> <span class="o">-&gt;</span> <span class="n">c</span><span class="o">::</span><span class="n">cs</span>
+  <span class="k">let</span> <span class="n">root</span> <span class="o">=</span> <span class="nn">E</span><span class="p">.</span><span class="nc">Parse</span> <span class="s2">"&lt;list&gt;&lt;int v='1' /&gt;&lt;list&gt;&lt;int v='2' /&gt;&lt;/list&gt;&lt;int v='3' /&gt;&lt;/list&gt;"</span>
 
   <span class="k">let</span> <span class="n">e</span><span class="o">,</span><span class="n">e'</span>    <span class="o">=</span> <span class="n">future</span> <span class="bp">()</span>
 
-  <span class="k">let</span> <span class="n">int_</span>    <span class="o">=</span> <span class="o">!&lt;&gt;</span><span class="s2">"int"</span>  <span class="o">&gt;.</span> <span class="o">!@</span><span class="s2">"v"</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="nn">Int32</span><span class="p">.</span><span class="nc">Parse</span> <span class="o">&gt;&gt;</span> <span class="nc">I</span><span class="o">)</span>
-  <span class="k">let</span> <span class="kt">list</span>    <span class="o">=</span> <span class="o">!&lt;&gt;</span><span class="s2">"list"</span> <span class="o">&gt;.</span> <span class="n">child</span> <span class="o">&gt;.</span> <span class="n">all</span> <span class="n">e</span> <span class="o">.&gt;</span> <span class="n">parent</span> <span class="o">=&gt;</span> <span class="nc">L</span>
+  <span class="k">let</span> <span class="n">int_</span>    <span class="o">=</span> <span class="o">!&lt;&gt;</span><span class="s2">"int"</span>  <span class="o">&gt;.</span> <span class="o">!@</span><span class="s2">"v"</span>      <span class="o">=&gt;</span> <span class="o">(</span><span class="nn">Int32</span><span class="p">.</span><span class="nc">Parse</span> <span class="o">&gt;&gt;</span> <span class="nc">I</span><span class="o">)</span>
+  <span class="k">let</span> <span class="kt">list</span>    <span class="o">=</span> <span class="o">!&lt;&gt;</span><span class="s2">"list"</span> <span class="o">&gt;.</span> <span class="n">children</span> <span class="n">e</span> <span class="o">=&gt;</span>                 <span class="nc">L</span>
 
   <span class="k">do</span>  <span class="n">e'</span>     <span class="o">:=</span> <span class="n">int_</span> <span class="o">&lt;/&gt;</span> <span class="kt">list</span>
 
@@ -99,20 +97,12 @@
 <div class="highlight"><pre><span class="nc">S</span> <span class="o">(</span><span class="nc">L</span> <span class="o">[</span><span class="nc">I</span> <span class="mi">1</span><span class="o">;</span> <span class="nc">L</span> <span class="o">[</span><span class="nc">I</span> <span class="mi">2</span><span class="o">];</span> <span class="nc">I</span> <span class="mi">3</span><span class="o">])</span>
 </pre></div>
 
-<p>It is important to note that you are in full control of navigation at all times!</p>
-
-<div class="highlight"><pre>  <span class="k">let</span> <span class="kt">list</span>    <span class="o">=</span> <span class="o">!&lt;&gt;</span><span class="s2">"list"</span> <span class="o">&gt;.</span> <span class="n">child</span> <span class="o">&gt;.</span> <span class="n">all</span> <span class="n">e</span> <span class="o">=&gt;</span> <span class="nc">L</span>
-</pre></div>
-
-<div class="highlight"><pre><span class="nc">S</span> <span class="o">(</span><span class="nc">L</span> <span class="o">[</span><span class="nc">I</span> <span class="mi">1</span><span class="o">;</span> <span class="nc">L</span> <span class="o">[</span><span class="nc">I</span> <span class="mi">2</span><span class="o">])</span>
-</pre></div>
-
-<h1 id="browse">Browse</h1>
+<h1>Browse</h1>
 
 <ul>
 <li><a href="https://github.com/corsis/XParsec/blob/master/XParsec.fsi#slider">Signatures</a></li>
 <li><a href="https://github.com/corsis/XParsec/blob/master/XParsec.fs#slider">Implementation</a></li>
-</ul><h1 id="license">License</h1>
+</ul><h1>License</h1>
 
 <pre><code>Copyright (c) 2012, Cetin Sert
 
@@ -147,7 +137,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 </code></pre>
 
-<h1 id="contact">Contact</h1>
+<h1>Contact</h1>
 
 <p><a href="https://github.com/corsis/"><img src="http://portfusion.sourceforge.net/i/l100.png" alt="corsis" title="Corsis Research"></a></p>
 
