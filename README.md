@@ -55,7 +55,7 @@ type Xobj  = I of int | L of Xobj list
 
 let main _ =
 
-  let root = E.Parse "<list><int v='1' /><list><int v='2' /></list><int v='3' /></list>"
+  let root = E.Parse "<list><int v='1'/><list><int v='2'/></list><int v='3'/></list>"
 
   let e,e'    = future ()
 
