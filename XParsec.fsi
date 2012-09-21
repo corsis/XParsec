@@ -74,17 +74,17 @@ module Xml =
 
   [<AutoOpen>]
   module Operators =
-    val inline ( !> )  :  ^b -> ^a when ^a : (static member op_Implicit : ^b -> ^a)
-    val inline ( ~~ )  : string ->           bool
-    val inline ( -!- ) : string -> string -> bool
+    val inline ( !>  ) : ^b -> ^a when ^a : (static member op_Implicit : ^b -> ^a)
+    val inline ( ~~  ) : string ->           bool
     val inline ( -?- ) : string -> string -> bool
+    val inline ( -!- ) : string -> string -> bool
 
     val inline ( @@ )  : E -> N ->  A
     val inline ( @  )  : E -> N ->  V
-    val inline ( @< )  : E -> N -> 'a -> unit
+    val inline ( @- )  : E -> N ->       bool
+    val inline ( @+ )  : E -> N ->       bool
     val inline ( @? )  : E -> N ->  V -> bool
     val inline ( @! )  : E -> N ->  V -> bool
-    val inline ( @~ )  : E -> N ->       bool
 
     val inline name   : ^x -> N when ^x : (member Name  : XName)
     val inline value  : ^x -> V when ^x : (member Value : V)

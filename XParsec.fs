@@ -92,15 +92,15 @@ module Xml =
 
     let inline (!>)  x   = ( ^a : (static member op_Implicit : ^b -> ^a) x )
     let inline (~~)  a   = a |>           String.IsNullOrWhiteSpace
-    let inline (-!-) a b = match (a : string) with null -> true  | _ -> a.Contains b |> not
     let inline (-?-) a b = match (a : string) with null -> false | _ -> a.Contains b
+    let inline (-!-) a b = match (a : string) with null -> true  | _ -> a.Contains b |> not
 
     let inline (@@) (e:E) n   =       e.Attribute(!> n)
     let inline (@ ) (e:E) n   = match e.Attribute(!> n) with null -> Δ | a -> a.Value
-    let inline (@<) (e:E) n v = e.SetAttributeValue(!> n, v)
+    let inline (@-)  e    n   = ~~(e @ n)
+    let inline (@+)  e    n   = ~~(e @ n) |> not
     let inline (@?)  e    n v =   (e @ n) -?- v
     let inline (@!)  e    n v =   (e @ n) -!- v
-    let inline (@~)  e    n   = ~~(e @ n)
 
     let inline name  x = ( ^a : (member Name  : XName ) x ).LocalName
     let inline value x = ( ^a : (member Value : string) x )
@@ -113,10 +113,10 @@ module Xml =
     let inline ( !<>  ) n   (s : Source<_,E>) = (match s.Current.Name.LocalName = n  with false -> F | _ -> S s.Current),s
     let inline ( !@@  ) n   (s : Source<_,E>) = (match s.Current.Attribute    (!> n) with null  -> F | a -> S a        ),s
     let inline ( !@   ) n   (s : Source<_,E>) = (match s.Current.Attribute    (!> n) with null  -> F | a -> S a.Value  ),s
-    let inline ( !@-  ) n   (s : Source<_,E>) = ( s.Current @~ n        |> Reply<_>.FromBool),s
-    let inline ( !@+  ) n   (s : Source<_,E>) = ( s.Current @~ n |> not |> Reply<_>.FromBool),s
-    let inline (  @~? ) n v (s : Source<_,E>) = ((s.Current @? n <| v)  |> Reply<_>.FromBool),s
-    let inline (  @~! ) n v (s : Source<_,E>) = ((s.Current @! n <| v)  |> Reply<_>.FromBool),s
+    let inline ( !@-  ) n   (s : Source<_,E>) = ( s.Current @- n       |> Reply<_>.FromBool),s
+    let inline ( !@+  ) n   (s : Source<_,E>) = ( s.Current @+ n       |> Reply<_>.FromBool),s
+    let inline (  @~? ) n v (s : Source<_,E>) = ((s.Current @? n <| v) |> Reply<_>.FromBool),s
+    let inline (  @~! ) n v (s : Source<_,E>) = ((s.Current @! n <| v) |> Reply<_>.FromBool),s
 
 
   module Navigation =
