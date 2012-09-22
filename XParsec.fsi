@@ -119,11 +119,20 @@ module Xml =
 
 
 module Array =
+<<<<<<< HEAD
   type     Position =                     Int32
   type    'a Stream =       Source<'a [], Position>
   val           pre :                     Position
   val          post :                     Position
   module      Array = val inline source : Position -> 'a seq -> Source<'a Stream,'a>
+=======
+  type   Position = Int32
+  type  'a Stream = Source<'a [], Position>
+  module    Array = val inline source : Position -> 'a seq -> Source<'a Stream,'a>
+  type Int32 with
+    static member pre  :                 Position
+    static member post :                 Position
+>>>>>>> 92ab1afc0931c4896e9f38357b651d5f0f80c796
   [<AutoOpen>]
   module Navigation =
     val inline next :                                           Parser<'a Stream,'a,'a>
