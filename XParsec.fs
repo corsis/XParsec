@@ -151,8 +151,9 @@ module Array =
     static member pre  = Int32.MinValue
     static member post = Int32.MaxValue
 
-  module Array = let inline (|?|)  i (a :_ []  ) = i > - 1 && i < a.Length
-                 let inline source i (s : _ seq) = let a = Seq.toArray s in let i = clamp -1 a.Length i in Source(Source(a, i), if i |?| a then a.[i] else Δ)
+  module Array =
+    let inline (|?|)    (a :_ []) i = i > - 1 && i < a.Length
+    let inline source i (s : _ seq) = let a = Seq.toArray s in let i = clamp -1 a.Length i in Source(Source(a, i), if a |?| i then a.[i] else Δ)
 
   type  Σ<'s,'a>  = Source<'s,'a>
   let inline σ (s : Source< _, _>) = s.State
