@@ -144,22 +144,18 @@ module Array =
 
   type  Position = Int32
   type 'a Stream = Source<'a [], Position>
+  let        pre = Position.MinValue
+  let       post = Position.MaxValue
 
   let inline clamp l u n = l |> max <| n |> min <| u
-
-  type Int32 with
-    static member pre  = Int32.MinValue
-    static member post = Int32.MaxValue
+  let inline (|?|)  a  i = i > - 1 && i < (a:_[]).Length
 
   module Array =
-    let inline (|?|)    (a :_ []) i = i > - 1 && i < a.Length
     let inline source i (s : _ seq) = let a = Seq.toArray s in let i = clamp -1 a.Length i in Source(Source(a, i), if a |?| i then a.[i] else Δ)
 
-  type  Σ<'s,'a>  = Source<'s,'a>
-  let inline σ (s : Source< _, _>) = s.State
-  let inline χ (s : Source< _, _>) = s.Current
-
   module Navigation =
-
+    type  Σ<'s,'a>  = Source<'s,'a>
+    let inline σ (s : Source< _, _>) = s.State
+    let inline χ (s : Source< _, _>) = s.Current
     let inline next s = let a : _ [] = σ (σ s) in let c = χ (σ s) + 1 in match c < a.Length with false -> F,s | true -> S a.[c],Σ(Σ(a,c),a.[c])
     let inline prev s = let a : _ [] = σ (σ s) in let c = χ (σ s) - 1 in match c > -1       with false -> F,s | true -> S a.[c],Σ(Σ(a,c),a.[c])
