@@ -1,10 +1,10 @@
-**XParsec** works with **[any type](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L26)**, is **[very easy to extend](https://github.com/corsis/XParsec/blob/master/XParsec.fs#L102)**, supports **[domain-specific non-linear navigation](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L88)** and is **implemented in just 50 source lines of code**.
+**XParsec** works with **[any type](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L26)**, is **[very easy to extend](https://github.com/corsis/XParsec/blob/master/XParsec.fs#L81)**, supports **[domain-specific non-linear navigation](https://github.com/corsis/XParsec/blob/master/XParsec.fs#L122)** and is **[implemented in a single F# file with just ~100 source lines of code](https://github.com/corsis/XParsec/blob/master/XParsec.fs)**.
 
 (FParsec only works with `Char`s and can only go forward on a one dimensional `String`.)
 
 # Example 1
 
-**[XParsec.Xml](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L61)** is the first XParsec extension. It is **implemented in just 14 source lines of code** for the examples used below and provides complete freedom in navigating XML trees.
+**[XParsec.Xml](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L65)** is the first XParsec extension. It is **implemented in just 14 source lines of code** for the examples used below and provides complete freedom in navigating XML trees.
 
 ```fsharp
 open XParsec
@@ -57,12 +57,12 @@ let main _ =
 
   let root = E.Parse "<list><int v='1'/><list><int v='2'/></list><int v='3'/></list>"
 
-  let e,e'    = future ()
+  let e,e' = future ()
 
-  let int_    = !<>"int"  >. !@"v"      => (Int32.Parse >> I)
-  let list    = !<>"list" >. children e =>                 L
+  let int_ = !<>"int"  >. !@"v"      => (Int32.Parse >> I)
+  let list = !<>"list" >. children e =>                 L
 
-  do  e'     := int_ </> list
+  do  e'  := int_ </> list
 
   test e root
 ```
