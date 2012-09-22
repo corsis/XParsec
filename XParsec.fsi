@@ -127,5 +127,5 @@ module Array =
     static member post :                 Position
   [<AutoOpen>]
   module Navigation =
-    val inline next  :                                         Parser<'a Stream,'a,'a>
-    val inline prev  :                                         Parser<'a Stream,'a,'a>
+    val inline next :                                          Parser<'a Stream,'a,'a>
+    val inline prev :                                          Parser<'a Stream,'a,'a>
