@@ -17,11 +17,12 @@ type Source<'s,'a> =
 type Reply<'b_> = S of 'b_ | F with
   member inline Value   : 'b_
   member inline IsMatch : bool
-  static member inline FromBool :                          bool -> unit Reply
-  static member inline Negate   :                      'a Reply -> unit Reply
-  static member inline Put      :        'b         -> 'a Reply -> 'b   Reply
-  static member inline Map      : ('a -> 'b)        -> 'a Reply -> 'b   Reply
-  static member inline Choose   : ('a -> 'b option) -> 'a Reply -> 'b   Reply
+  static member inline fromBool :                          bool -> unit Reply
+  static member inline negate   :                      'a Reply -> unit Reply
+  static member inline toOption :                      'a Reply -> 'a  Option
+  static member inline put      :        'b         -> 'a Reply -> 'b   Reply
+  static member inline map      : ('a -> 'b)        -> 'a Reply -> 'b   Reply
+  static member inline choose   : ('a -> 'b option) -> 'a Reply -> 'b   Reply
 
 type Parser<'s,'a,'b> = Source<'s,'a> -> Reply<'b> * Source<'s,'a>
 
@@ -103,14 +104,27 @@ module Xml =
   [<AutoOpen>]
   module Navigation =
     type XElement with
-      member             NextElement : E
-      member         PreviousElement : E
-      member inline            Child : E
-      static member inline    source : E -> Source<E,E>
-    val next   :                            Parser<E,E,E>
-    val prev   :                            Parser<E,E,E>
-    val parent :                            Parser<E,E,E>
-    val child  :                            Parser<E,E,E>
+      member               NextElement : E
+      member           PreviousElement : E
+      member inline              Child : E
+      static member inline      source : E -> Source<E,E>
+    val next   :                              Parser<E,E,E>
+    val prev   :                              Parser<E,E,E>
+    val parent :                              Parser<E,E,E>
+    val child  :                              Parser<E,E,E>
     [<AutoOpen>]
     module Parsers =
       val inline children : Parser<E,E,'b> -> Parser<E,E,'b list>
+
+
+module Array =
+  type    Position = Int32
+  type   'a Stream = Source<'a [], Position>
+  module     Array = val inline source : Position -> 'a seq -> Source<'a Stream,'a>
+  type Int32 with
+    static member pre  :                 Position
+    static member post :                 Position
+  [<AutoOpen>]
+  module Navigation =
+    val inline next  :                                         Parser<'a Stream,'a,'a>
+    val inline prev  :                                         Parser<'a Stream,'a,'a>

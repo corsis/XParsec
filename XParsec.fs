@@ -24,11 +24,12 @@ type Source<'s,'a> =
 type 'a Reply = S of 'a | F with
   member inline r.Value   = match r with S x -> x | F -> raise <| new InvalidOperationException()
   member inline r.IsMatch = match r with F -> false | S _ -> true 
-  static member inline FromBool b = if b then S () else F
-  static member inline Negate   r = match r with F -> S () | S _ -> F
-  static member inline Put    x r = match r with F -> F    | S _ -> S      x
-  static member inline Map    f r = match r with F -> F    | S x -> S <| f x
-  static member inline Choose f r = match r with F -> F    | S x -> match f x with Some v -> S v | None -> F
+  static member inline fromBool b = if b then S () else F
+  static member inline negate   r = match r with F -> S () | S _ -> F
+  static member inline put    x r = match r with F -> F    | S _ -> S      x
+  static member inline map    f r = match r with F -> F    | S x -> S <| f x
+  static member inline choose f r = match r with F -> F    | S x -> match f x with Some v -> S v | None -> F
+  static member inline toOption r = match r with F -> None | S x -> Some x
 
 type Parser<'s,'a,'b> = Source<'s,'a> -> Reply<'b> * Source<'s,'a>
 
@@ -44,13 +45,13 @@ module Combinators =
 
   let inline future  () = let r = ref Δ in (fun s-> !r s), r : Parser<_,_,_> * Parser<_,_,_> ref
   let inline ahead   (p : Parser<_,_,_>)   s = let r,_ = p s in r,s
-  let inline negate  (p : Parser<_,_,_>)   s = let r,s = p s in Reply<_>.Negate   r,s
-  let inline (=>)    (p : Parser<_,_,_>) f s = let r,s = p s in Reply<_>.Map    f r,s
-  let inline (?>)    (p : Parser<_,_,_>) f s = let r,s = p s in Reply<_>.Choose f r,s
+  let inline negate  (p : Parser<_,_,_>)   s = let r,s = p s in Reply<_>.negate   r,s
+  let inline (=>)    (p : Parser<_,_,_>) f s = let r,s = p s in Reply<_>.map    f r,s
+  let inline (?>)    (p : Parser<_,_,_>) f s = let r,s = p s in Reply<_>.choose f r,s
 
-  let inline (.> ) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> F,s | S p -> let r,s = q s in Reply<_>.Put p r,s
+  let inline (.> ) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> F,s | S p -> let r,s = q s in Reply<_>.put p r,s
   let inline ( >.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> F,s | S _ -> q s
-  let inline (.>.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> F,s | S p -> let r,s = q s in Reply<_>.Map (fun q -> (p,q)) r,s
+  let inline (.>.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> F,s | S p -> let r,s = q s in Reply<_>.map (fun q -> (p,q)) r,s
   let inline (</>) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> q s | p   -> p,s
 
   let inline manyMax     n (p : Parser<_,_,_>) s =
@@ -60,8 +61,8 @@ module Combinators =
     let q = Seq.toList <| seq { while (b := source !l; l := p !b; !c < n && (reply !l).IsMatch) do c := !c + 1; yield (reply !l).Value }
     S q,!b
   let inline many          (p : Parser<_,_,_>) s = manyMax Int32.MaxValue p s
-  let inline many1         (p : Parser<_,_,_>) s = let r,s = many      p s in Reply<_>.Choose (function _::_ as l -> Some l | _ -> None) r,s
-  let inline array       n (p : Parser<_,_,_>) s = let r,s = manyMax n p s in Reply<_>.Choose (function         l -> let a = List.toArray l in (a.Length = n) ?-> a) r,s
+  let inline many1         (p : Parser<_,_,_>) s = let r,s = many      p s in Reply<_>.choose (function _::_ as l -> Some l | _ -> None) r,s
+  let inline array       n (p : Parser<_,_,_>) s = let r,s = manyMax n p s in Reply<_>.choose (function         l -> let a = List.toArray l in (a.Length = n) ?-> a) r,s
   let inline skipManyMax n (p : Parser<_,_,_>) s =
     let mutable b =    Δ
     let mutable l = (Δ,s)
@@ -69,8 +70,8 @@ module Combinators =
     while (b <- source l; l <- p b; c < n && (reply l).IsMatch) do c <- c + 1
     S c,b
   let inline skipMany      (p : Parser<_,_,_>) s = skipManyMax Int32.MaxValue p s
-  let inline skipMany1     (p : Parser<_,_,_>) s = let r,s = s |> skipMany p in Reply<_>.Choose (fun n -> if n > 0 then Some n  else None) r,s
-  let inline skipN       x (p : Parser<_,_,_>) s = let r,s = s |> skipMany p in Reply<_>.Choose (fun n -> if n = x then Some () else None) r,s
+  let inline skipMany1     (p : Parser<_,_,_>) s = let r,s = s |> skipMany p in Reply<_>.choose (fun n -> if n > 0 then Some n  else None) r,s
+  let inline skipN       x (p : Parser<_,_,_>) s = let r,s = s |> skipMany p in Reply<_>.choose (fun n -> if n = x then Some () else None) r,s
 
   let inline (!*.) p s =     many  p s
   let inline (!+.) p s =     many1 p s
@@ -113,10 +114,10 @@ module Xml =
     let inline ( !<>  ) n   (s : Source<_,E>) = (match s.Current.Name.LocalName = n  with false -> F | _ -> S s.Current),s
     let inline ( !@@  ) n   (s : Source<_,E>) = (match s.Current.Attribute    (!> n) with null  -> F | a -> S a        ),s
     let inline ( !@   ) n   (s : Source<_,E>) = (match s.Current.Attribute    (!> n) with null  -> F | a -> S a.Value  ),s
-    let inline ( !@-  ) n   (s : Source<_,E>) = ( s.Current @- n       |> Reply<_>.FromBool),s
-    let inline ( !@+  ) n   (s : Source<_,E>) = ( s.Current @+ n       |> Reply<_>.FromBool),s
-    let inline (  @~? ) n v (s : Source<_,E>) = ((s.Current @? n <| v) |> Reply<_>.FromBool),s
-    let inline (  @~! ) n v (s : Source<_,E>) = ((s.Current @! n <| v) |> Reply<_>.FromBool),s
+    let inline ( !@-  ) n   (s : Source<_,E>) = ( s.Current @- n       |> Reply<_>.fromBool),s
+    let inline ( !@+  ) n   (s : Source<_,E>) = ( s.Current @+ n       |> Reply<_>.fromBool),s
+    let inline (  @~? ) n v (s : Source<_,E>) = ((s.Current @? n <| v) |> Reply<_>.fromBool),s
+    let inline (  @~! ) n v (s : Source<_,E>) = ((s.Current @! n <| v) |> Reply<_>.fromBool),s
 
 
   module Navigation =
@@ -137,3 +138,27 @@ module Xml =
     module Parsers =
       open Combinators
       let inline children p = ahead (child>.p  .>.  many (next>.p)) => function c,cs -> c::cs
+
+
+module Array =
+
+  type  Position = Int32
+  type 'a Stream = Source<'a [], Position>
+
+  let inline clamp l u n = l |> max <| n |> min <| u
+
+  type Int32 with
+    static member pre  = Int32.MinValue
+    static member post = Int32.MaxValue
+
+  module Array = let inline (|?|)  i (a :_ []  ) = i > - 1 && i < a.Length
+                 let inline source i (s : _ seq) = let a = Seq.toArray s in let i = clamp -1 a.Length i in Source(Source(a, i), if i |?| a then a.[i] else Δ)
+
+  type  Σ<'s,'a>  = Source<'s,'a>
+  let inline σ (s : Source< _, _>) = s.State
+  let inline χ (s : Source< _, _>) = s.Current
+
+  module Navigation =
+
+    let inline next s = let a : _ [] = σ (σ s) in let c = χ (σ s) + 1 in match c < a.Length with false -> F,s | true -> S a.[c],Σ(Σ(a,c),a.[c])
+    let inline prev s = let a : _ [] = σ (σ s) in let c = χ (σ s) - 1 in match c > -1       with false -> F,s | true -> S a.[c],Σ(Σ(a,c),a.[c])
