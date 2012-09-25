@@ -14,7 +14,7 @@ type Source<'s,'a> =
   val Current : 'a
   new : 's * 'a -> Source<'s,'a>
 
-type Reply<'b_> = S of 'b_ | F with
+type Reply<'b_> = S of 'b_ | F | Q with
   member inline Value   : 'b_
   member inline IsMatch : bool
   static member inline fromBool :                          bool -> unit Reply

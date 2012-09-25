@@ -22,15 +22,15 @@ type Source<'s,'a> =
   new (s : 's, c : 'a) = { State = s; Current = c }
   override s.ToString () = String.Format("Source({0},{1})", s.State, s.Current)
 
-type 'a Reply = S of 'a | F with
-  member inline r.Value   = match r with S x -> x | F -> raise <| new InvalidOperationException()
-  member inline r.IsMatch = match r with F -> false | S _ -> true 
+type 'a Reply = S of 'a | F | Q with
+  member inline r.Value   = match r with S x -> x | Q | F -> raise <| new InvalidOperationException()
+  member inline r.IsMatch = match r with Q | F -> false | S _ -> true 
   static member inline fromBool b = if b then S () else F
-  static member inline negate   r = match r with F -> S () | S _ -> F
-  static member inline put    x r = match r with F -> F    | S _ -> S      x
-  static member inline map    f r = match r with F -> F    | S x -> S <| f x
-  static member inline choose f r = match r with F -> F    | S x -> match f x with Some v -> S v | None -> F
-  static member inline toOption r = match r with F -> None | S x -> Some x
+  static member inline negate   r = match r with Q -> Q | F -> S () | S _ -> F
+  static member inline put    x r = match r with Q -> Q | F -> F    | S _ -> S      x
+  static member inline map    f r = match r with Q -> Q | F -> F    | S x -> S <| f x
+  static member inline choose f r = match r with Q -> Q | F -> F    | S x -> match f x with Some v -> S v | None -> F
+  static member inline toOption r = match r with      Q | F -> None | S x -> Some x
 
 type Parser<'s,'a,'b> = Source<'s,'a> -> Reply<'b> * Source<'s,'a>
 
@@ -50,10 +50,10 @@ module Combinators =
   let inline (=>)    (p : Parser<_,_,_>) f s = let r,s = p s in Reply<_>.map    f r,s
   let inline (?>)    (p : Parser<_,_,_>) f s = let r,s = p s in Reply<_>.choose f r,s
 
-  let inline (.> ) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> F,s | S p -> let r,s = q s in Reply<_>.put p r,s
-  let inline ( >.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> F,s | S _ -> q s
-  let inline (.>.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> F,s | S p -> let r,s = q s in Reply<_>.map (fun q -> (p,q)) r,s
-  let inline (</>) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with F -> q s | p   -> p,s
+  let inline (.> ) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with Q -> Q,s | F -> F,s | S p -> let r,s = q s in Reply<_>.put p r,s
+  let inline ( >.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with Q -> Q,s | F -> F,s | S _ -> q s
+  let inline (.>.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with Q -> Q,s | F -> F,s | S p -> let r,s = q s in Reply<_>.map (fun q -> (p,q)) r,s
+  let inline (</>) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with Q | F -> q s | p   -> p,s
 
   let inline manyMax     n (p : Parser<_,_,_>) s =
     let b = ref    Δ
@@ -79,7 +79,7 @@ module Combinators =
   let inline (!*)  p s = skipMany  p s
   let inline (!+)  p s = skipMany1 p s
 
-  let inline (>>=) (p : Parser<'s,'a,'b>) f s = let r,s = p s in match r with F -> F,s | S b -> f b s
+  let inline (>>=) (p : Parser<'s,'a,'b>) f s = let r,s = p s in match r with Q -> Q,s | F -> F,s | S b -> f b s
 
 
 module Xml =
@@ -133,10 +133,10 @@ module Xml =
       member inline           e.Child = if e.HasElements then e.Elements() |> Seq.head else Δ
       static member inline   source e = Source((e:E),e)
 
-    let next   (s : Source<_,E>) = match s.Current.NextElement     with null -> F,s | x -> S x,E.source x
-    let prev   (s : Source<_,E>) = match s.Current.PreviousElement with null -> F,s | x -> S x,E.source x
-    let parent (s : Source<_,E>) = match s.Current.Parent          with null -> F,s | x -> S x,E.source x
-    let child  (s : Source<_,E>) = match s.Current.Child           with null -> F,s | x -> S x,E.source x
+    let next   (s : Source<_,E>) = match s.Current.NextElement     with null -> Q,s | x -> S x,E.source x
+    let prev   (s : Source<_,E>) = match s.Current.PreviousElement with null -> Q,s | x -> S x,E.source x
+    let parent (s : Source<_,E>) = match s.Current.Parent          with null -> Q,s | x -> S x,E.source x
+    let child  (s : Source<_,E>) = match s.Current.Child           with null -> Q,s | x -> S x,E.source x
 
     module Parsers =
       open Combinators
@@ -160,5 +160,5 @@ module Array =
     type  Σ<'s,'a>  = Source<'s,'a>
     let inline σ (s : Source< _, _>) = s.State
     let inline χ (s : Source< _, _>) = s.Current
-    let inline next s = let a : _ [] = σ (σ s) in let c = χ (σ s) + 1 in match c < a.Length with false -> F,s | true -> S a.[c],Σ(Σ(a,c),a.[c])
-    let inline prev s = let a : _ [] = σ (σ s) in let c = χ (σ s) - 1 in match c > -1       with false -> F,s | true -> S a.[c],Σ(Σ(a,c),a.[c])
+    let inline next s = let a : _ [] = σ (σ s) in let c = χ (σ s) + 1 in match c < a.Length with false -> Q,s | true -> S a.[c],Σ(Σ(a,c),a.[c])
+    let inline prev s = let a : _ [] = σ (σ s) in let c = χ (σ s) - 1 in match c > -1       with false -> Q,s | true -> S a.[c],Σ(Σ(a,c),a.[c])
