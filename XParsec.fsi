@@ -62,6 +62,7 @@ module Combinators =
   val inline ( !*  )     :        Parser<'s,'a,'b> -> Parser<'s,'a,int>
   val inline ( !+  )     :        Parser<'s,'a,'b> -> Parser<'s,'a,int>
   
+  val inline ( >>= ) : Parser<'s,'a,'b> -> ('b -> Parser<'s,'a,'c>) -> Parser<'s,'a,'c>
 
 module Xml =
 

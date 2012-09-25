@@ -20,6 +20,7 @@ type Source<'s,'a> =
   val State   : 's
   val Current : 'a
   new (s : 's, c : 'a) = { State = s; Current = c }
+  override s.ToString () = String.Format("Source({0},{1})", s.State, s.Current)
 
 type 'a Reply = S of 'a | F with
   member inline r.Value   = match r with S x -> x | F -> raise <| new InvalidOperationException()
@@ -77,6 +78,8 @@ module Combinators =
   let inline (!+.) p s =     many1 p s
   let inline (!*)  p s = skipMany  p s
   let inline (!+)  p s = skipMany1 p s
+
+  let inline (>>=) (p : Parser<'s,'a,'b>) f s = let r,s = p s in match r with F -> F,s | S b -> f b s
 
 
 module Xml =
