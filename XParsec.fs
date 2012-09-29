@@ -45,8 +45,9 @@ module Combinators =
   let inline current (s : Source<_,_>) = S <| s.Current,s
 
   let inline future  () = let r = ref Δ in (fun s-> !r s), r : Parser<_,_,_> * Parser<_,_,_> ref
-  let inline ahead   (p : Parser<_,_,_>)   s = let r,_ = p s in r,s
+  let inline ahead   (p : Parser<_,_,_>)   s = let r,_ = p s in                   r,s
   let inline negate  (p : Parser<_,_,_>)   s = let r,s = p s in Reply<_>.negate   r,s
+  let inline (~-)    (p : Parser<_,_,_>)   s = let r,s = p s in Reply<_>.negate   r,s
   let inline (=>)    (p : Parser<_,_,_>) f s = let r,s = p s in Reply<_>.map    f r,s
   let inline (?>)    (p : Parser<_,_,_>) f s = let r,s = p s in Reply<_>.choose f r,s
 
