@@ -9,6 +9,8 @@ html {
   background: #6c7989 linear-gradient(#6c7989, #434b55) fixed;
 }
 
+a img { border: none; }
+
 body {
   padding: 50px 0;
   margin: 0;
