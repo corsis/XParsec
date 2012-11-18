@@ -158,4 +158,4 @@ module Xml =
 
     module Parsers =
       open Combinators
-      let inline children p = !! (child>.p  .>.  many (next>.p)) => function c,cs -> c::cs
+      let inline children p = !!(child>.p  .>.  !*.(next>.p)) => function c,cs -> c::cs
