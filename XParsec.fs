@@ -12,8 +12,8 @@ module XParsec
 
 open System
 
-
 let inline Δ<'a> = Unchecked.defaultof<'a>
+
 
 [<Struct>]
 type Source<'s,'a> =
@@ -45,8 +45,7 @@ module Combinators =
   let inline current (s : Source<_,_>) = S <| s.Current,s
 
   let inline future  () = let r = ref Δ in (fun s-> !r s), r : Parser<_,_,_> * Parser<_,_,_> ref
-  let inline ahead   (p : Parser<_,_,_>)   s = let r,_ = p s in                   r,s
-  let inline negate  (p : Parser<_,_,_>)   s = let r,s = p s in Reply<_>.negate   r,s
+  let inline (!!)    (p : Parser<_,_,_>)   s = let r,_ = p s in                   r,s
   let inline (~-)    (p : Parser<_,_,_>)   s = let r,s = p s in Reply<_>.negate   r,s
   let inline (=>)    (p : Parser<_,_,_>) f s = let r,s = p s in Reply<_>.map    f r,s
   let inline (?>)    (p : Parser<_,_,_>) f s = let r,s = p s in Reply<_>.choose f r,s
@@ -83,67 +82,6 @@ module Combinators =
   let inline (>>=) (p : Parser<'s,'a,'b>) f s = let r,s = p s in match r with Q -> Q,s | F -> F,s | S b -> f b s
 
 
-module Xml =
-
-  open System.Xml.Linq
-
-  type E = XElement
-  type A = XAttribute
-  type N = string
-  type V = string
-
-
-  module Operators =
-
-    let inline (!>)  x   = ( ^a : (static member op_Implicit : ^b -> ^a) x )
-    let inline (~~)  a   = a |>           String.IsNullOrWhiteSpace
-    let inline (-?-) a b = match (a : string) with null -> false | _ -> a.Contains b
-    let inline (-!-) a b = match (a : string) with null -> true  | _ -> a.Contains b |> not
-
-    let inline (@@) (e:E) n   =       e.Attribute(!> n)
-    let inline (@ ) (e:E) n   = match e.Attribute(!> n) with null -> Δ | a -> a.Value
-    let inline (@-)  e    n   = ~~(e @ n)
-    let inline (@+)  e    n   = ~~(e @ n) |> not
-    let inline (@?)  e    n v =   (e @ n) -?- v
-    let inline (@!)  e    n v =   (e @ n) -!- v
-
-    let inline name  x = ( ^a : (member Name  : XName ) x ).LocalName
-    let inline value x = ( ^a : (member Value : string) x )
-
-  open Operators
-    
-        
-  module Parsers =
-
-    let inline ( !<>  ) n   (s : Source<_,E>) = (match s.Current.Name.LocalName = n  with false -> F | _ -> S s.Current),s
-    let inline ( !@@  ) n   (s : Source<_,E>) = (match s.Current.Attribute    (!> n) with null  -> F | a -> S a        ),s
-    let inline ( !@   ) n   (s : Source<_,E>) = (match s.Current.Attribute    (!> n) with null  -> F | a -> S a.Value  ),s
-    let inline ( !@-  ) n   (s : Source<_,E>) = ( s.Current @- n       |> Reply<_>.fromBool),s
-    let inline ( !@+  ) n   (s : Source<_,E>) = ( s.Current @+ n       |> Reply<_>.fromBool),s
-    let inline (  @~? ) n v (s : Source<_,E>) = ((s.Current @? n <| v) |> Reply<_>.fromBool),s
-    let inline (  @~! ) n v (s : Source<_,E>) = ((s.Current @! n <| v) |> Reply<_>.fromBool),s
-
-
-  module Navigation =
-
-    type N = XNode
-
-    type XElement with
-      member            e.NextElement = let n = e :> N in let mutable c = n in (while (c <- c.NextNode;     match c with :? E | null -> false | _ -> true) do ()); match c with :? E as e -> e | _ -> Δ
-      member        e.PreviousElement = let n = e :> N in let mutable c = n in (while (c <- c.PreviousNode; match c with :? E | null -> false | _ -> true) do ()); match c with :? E as e -> e | _ -> Δ
-      member inline           e.Child = if e.HasElements then e.Elements() |> Seq.head else Δ
-      static member inline   source e = Source((e:E),e)
-
-    let next   (s : Source<_,E>) = match s.Current.NextElement     with null -> Q,s | x -> S x,E.source x
-    let prev   (s : Source<_,E>) = match s.Current.PreviousElement with null -> Q,s | x -> S x,E.source x
-    let parent (s : Source<_,E>) = match s.Current.Parent          with null -> Q,s | x -> S x,E.source x
-    let child  (s : Source<_,E>) = match s.Current.Child           with null -> Q,s | x -> S x,E.source x
-
-    module Parsers =
-      open Combinators
-      let inline children p = ahead (child>.p  .>.  many (next>.p)) => function c,cs -> c::cs
-
-
 module Array =
 
   type  Position = Int32
@@ -163,3 +101,61 @@ module Array =
     let inline χ (s : Source< _, _>) = s.Current
     let inline next s = let a : _ [] = σ (σ s) in let c = χ (σ s) + 1 in match c < a.Length with false -> Q,s | true -> S a.[c],Σ(Σ(a,c),a.[c])
     let inline prev s = let a : _ [] = σ (σ s) in let c = χ (σ s) - 1 in match c > -1       with false -> Q,s | true -> S a.[c],Σ(Σ(a,c),a.[c])
+
+
+module Xml =
+
+  open System.Xml.Linq
+
+  type E = XElement
+  type A = XAttribute
+  type N = string
+  type V = string
+
+  module Operators =
+
+    let inline (!>)  x   = ( ^a : (static member op_Implicit : ^b -> ^a) x )
+    let inline (~~)  a   = a |>           String.IsNullOrWhiteSpace
+    let inline (-?-) a b = match (a : string) with null -> false | _ -> a.Contains b
+    let inline (-!-) a b = match (a : string) with null -> true  | _ -> a.Contains b |> not
+
+    let inline (@@) (e:E) n   =       e.Attribute(!> n)
+    let inline (@ ) (e:E) n   = match e.Attribute(!> n) with null -> Δ | a -> a.Value
+    let inline (@-)  e    n   = ~~(e @ n)
+    let inline (@+)  e    n   = ~~(e @ n) |> not
+    let inline (@?)  e    n v =   (e @ n) -?- v
+    let inline (@!)  e    n v =   (e @ n) -!- v
+
+    let inline name  x = ( ^a : (member Name  : XName ) x ).LocalName
+    let inline value x = ( ^a : (member Value : string) x )
+
+  open Operators
+        
+  module Parsers =
+
+    let inline ( !<>  ) n   (s : Source<_,E>) = (match s.Current.Name.LocalName = n  with false -> F | _ -> S s.Current),s
+    let inline ( !@@  ) n   (s : Source<_,E>) = (match s.Current.Attribute    (!> n) with null  -> F | a -> S a        ),s
+    let inline ( !@   ) n   (s : Source<_,E>) = (match s.Current.Attribute    (!> n) with null  -> F | a -> S a.Value  ),s
+    let inline ( !@-  ) n   (s : Source<_,E>) = ( s.Current @- n       |> Reply<_>.fromBool),s
+    let inline ( !@+  ) n   (s : Source<_,E>) = ( s.Current @+ n       |> Reply<_>.fromBool),s
+    let inline (  @~? ) n v (s : Source<_,E>) = ((s.Current @? n <| v) |> Reply<_>.fromBool),s
+    let inline (  @~! ) n v (s : Source<_,E>) = ((s.Current @! n <| v) |> Reply<_>.fromBool),s
+
+  module Navigation =
+
+    type N = XNode
+
+    type XElement with
+      member            e.NextElement = let n = e :> N in let mutable c = n in (while (c <- c.NextNode;     match c with :? E | null -> false | _ -> true) do ()); match c with :? E as e -> e | _ -> Δ
+      member        e.PreviousElement = let n = e :> N in let mutable c = n in (while (c <- c.PreviousNode; match c with :? E | null -> false | _ -> true) do ()); match c with :? E as e -> e | _ -> Δ
+      member inline           e.Child = if e.HasElements then e.Elements() |> Seq.head else Δ
+      static member inline   source e = Source((e:E),e)
+
+    let next   (s : Source<_,E>) = match s.Current.NextElement     with null -> Q,s | x -> S x,E.source x
+    let prev   (s : Source<_,E>) = match s.Current.PreviousElement with null -> Q,s | x -> S x,E.source x
+    let parent (s : Source<_,E>) = match s.Current.Parent          with null -> Q,s | x -> S x,E.source x
+    let child  (s : Source<_,E>) = match s.Current.Child           with null -> Q,s | x -> S x,E.source x
+
+    module Parsers =
+      open Combinators
+      let inline children p = ahead (child>.p  .>.  many (next>.p)) => function c,cs -> c::cs

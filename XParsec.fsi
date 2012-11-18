@@ -5,8 +5,8 @@ module XParsec
 
 open   System
 
-
 val inline Δ<'a> : 'a
+
 
 [<Struct>]
 type Source<'s,'a> =
@@ -38,8 +38,7 @@ module Combinators =
   val inline current : Parser<'s,'a,'a>
 
   val inline future  : unit -> Parser<'s,'a,'b> * Parser<'s,'a,'b> ref
-  val inline ahead   : Parser<'s,'a,'b> ->                      Parser<'s,'a,'b>
-  val inline negate  : Parser<'s,'a,'b> ->                      Parser<'s,'a,unit>
+  val inline ( !! )  : Parser<'s,'a,'b> ->                      Parser<'s,'a,'b>
   val inline ( ~- )  : Parser<'s,'a,'b> ->                      Parser<'s,'a,unit>
   val inline ( => )  : Parser<'s,'a,'b> -> ('b -> 'c)        -> Parser<'s,'a,'c>
   val inline ( ?> )  : Parser<'s,'a,'b> -> ('b -> 'c option) -> Parser<'s,'a,'c>
@@ -65,6 +64,19 @@ module Combinators =
   
   val inline ( >>= ) : Parser<'s,'a,'b> -> ('b -> Parser<'s,'a,'c>) -> Parser<'s,'a,'c>
 
+
+module Array =
+  type     Position =                     Int32
+  type    'a Stream =       Source<'a [], Position>
+  val           pre :                     Position
+  val          post :                     Position
+  module      Array = val inline source : Position -> 'a seq -> Source<'a Stream,'a>
+  [<AutoOpen>]
+  module Navigation =
+    val inline next :                                           Parser<'a Stream,'a,'a>
+    val inline prev :                                           Parser<'a Stream,'a,'a>
+
+
 module Xml =
 
   open System.Xml.Linq
@@ -73,7 +85,6 @@ module Xml =
   type A = XAttribute
   type N = string
   type V = string
-
 
   [<AutoOpen>]
   module Operators =
@@ -92,7 +103,6 @@ module Xml =
     val inline name   : ^x -> N when ^x : (member Name  : XName)
     val inline value  : ^x -> V when ^x : (member Value : V)
 
-
   [<AutoOpen>]
   module Parsers =
     val inline ( !<>  ) : N ->      Parser<'s,E,E>
@@ -102,7 +112,6 @@ module Xml =
     val inline ( !@+  ) : N ->      Parser<'s,E,unit>
     val inline (  @~? ) : N -> V -> Parser<'s,E,unit>
     val inline (  @~! ) : N -> V -> Parser<'s,E,unit>
-
 
   [<AutoOpen>]
   module Navigation =
@@ -118,15 +127,3 @@ module Xml =
     [<AutoOpen>]
     module Parsers =
       val inline children : Parser<E,E,'b> -> Parser<E,E,'b list>
-
-
-module Array =
-  type     Position =                     Int32
-  type    'a Stream =       Source<'a [], Position>
-  val           pre :                     Position
-  val          post :                     Position
-  module      Array = val inline source : Position -> 'a seq -> Source<'a Stream,'a>
-  [<AutoOpen>]
-  module Navigation =
-    val inline next :                                           Parser<'a Stream,'a,'a>
-    val inline prev :                                           Parser<'a Stream,'a,'a>
