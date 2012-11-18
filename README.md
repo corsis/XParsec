@@ -10,6 +10,7 @@
 open XParsec
 open XParsec.Xml
 
+[<EntryPoint>]
 let main _ =
 
   let test parse = printfn "%A" << reply << parse << E.source
@@ -28,13 +29,13 @@ let main _ =
   let parser2 = (parent => name) </> (!*child >. !@"font")
 
   // graceful non-linear look-ahead (here = down in Xml)
-  let parser3 = ahead parser1 .>. (current => name)
+  let parser3 = !!parser1 .>. (current => name)
 
   // brand-new non-linear look-back (here = up   in Xml)
   let S d,_   = E.source root |> (!*child >. current)
-  let parser4 = (ahead <| many (parent => name)) .>. (current => name)
+  let parser4 = !!(many (parent => name)) .>. (current => name)
 
-  test parser1 root; test parser2 root; test parser3 root; test parser4 d
+  test parser1 root; test parser2 root; test parser3 root; test parser4 d; 0
 ```
 ```fsharp
 S (["a"; "b"; "c"; "d"], "Arial")
@@ -53,6 +54,7 @@ open XParsec.Xml
 
 type Xobj  = I of int | L of Xobj list
 
+[<EntryPoint>]
 let main _ =
 
   let root = E.Parse "<list><int v='1'/><list><int v='2'/></list><int v='3'/></list>"
@@ -64,7 +66,7 @@ let main _ =
 
   do  e'  := int_ </> list
 
-  test e root
+  test e root; 0
 ```
 ```fsharp
 S (L [I 1; L [I 2]; I 3])
