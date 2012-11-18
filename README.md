@@ -35,9 +35,7 @@ let main _ =
   let S d,_   = E.source root |> (!*child >. current)
   let parser4 = !!(many (parent => name)) .>. (current => name)
 
-  test parser1 root; test parser2 root; test parser3 root; test parser4 d
-
-  0
+  test parser1 root; test parser2 root; test parser3 root; test parser4 d; 0
 ```
 ```fsharp
 S (["a"; "b"; "c"; "d"], "Arial")
@@ -68,9 +66,7 @@ let main _ =
 
   do  e'  := int_ </> list
 
-  test e root
-
-  0
+  test e root; 0
 ```
 ```fsharp
 S (L [I 1; L [I 2]; I 3])
