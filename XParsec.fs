@@ -53,7 +53,7 @@ module Combinators =
   let inline (.> ) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with Q -> Q,s | F -> F,s | S p -> let r,s = q s in Reply<_>.put p r,s
   let inline ( >.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with Q -> Q,s | F -> F,s | S _ -> q s
   let inline (.>.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with Q -> Q,s | F -> F,s | S p -> let r,s = q s in Reply<_>.map (fun q -> (p,q)) r,s
-  let inline (</>) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with Q | F -> q s | p   -> p,s
+  let inline (</>) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with Q | F -> q s | p -> p,s
 
   let inline manyMax     n (p : Parser<_,_,_>) s =
     let b = ref    Δ
@@ -99,9 +99,8 @@ module Array =
     type  Σ<'s,'a>  = Source<'s,'a>
     let inline σ (s : Source< _, _>) = s.State
     let inline χ (s : Source< _, _>) = s.Current
-    let inline next s = let a : _ [] = σ (σ s) in let c = χ (σ s) + 1 in match c < a.Length with false -> Q,s | true -> S a.[c],Σ(Σ(a,c),a.[c])
-    let inline prev s = let a : _ [] = σ (σ s) in let c = χ (σ s) - 1 in match c > -1       with false -> Q,s | true -> S a.[c],Σ(Σ(a,c),a.[c])
-
+    let inline next s = let a : _ [] = σ (σ s) in let c = χ (σ s) + 1 in if c < a.Length then S a.[c],Σ(Σ(a,c),a.[c]) else Q,s
+    let inline prev s = let a : _ [] = σ (σ s) in let c = χ (σ s) - 1 in if c > -1       then S a.[c],Σ(Σ(a,c),a.[c]) else Q,s
 
 module Xml =
 
@@ -115,7 +114,7 @@ module Xml =
   module Operators =
 
     let inline (!>)  x   = ( ^a : (static member op_Implicit : ^b -> ^a) x )
-    let inline (~~)  a   = a |>           String.IsNullOrWhiteSpace
+    let inline (~~)  a   = a |> String.IsNullOrWhiteSpace
     let inline (-?-) a b = match (a : string) with null -> false | _ -> a.Contains b
     let inline (-!-) a b = match (a : string) with null -> true  | _ -> a.Contains b |> not
 
