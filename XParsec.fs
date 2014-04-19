@@ -102,6 +102,7 @@ module Array =
     let inline next s = let a : _ [] = σ (σ s) in let c = χ (σ s) + 1 in if c < a.Length then S a.[c],Σ(Σ(a,c),a.[c]) else Q,s
     let inline prev s = let a : _ [] = σ (σ s) in let c = χ (σ s) - 1 in if c > -1       then S a.[c],Σ(Σ(a,c),a.[c]) else Q,s
 
+
 module Xml =
 
   open System.Xml.Linq
