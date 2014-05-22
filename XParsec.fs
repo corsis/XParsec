@@ -53,7 +53,7 @@ module Combinators =
   let inline (.> ) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with Q -> Q,s | F -> F,s | S p -> let r,s = q s in Reply<_>.put p r,s
   let inline ( >.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with Q -> Q,s | F -> F,s | S _ -> q s
   let inline (.>.) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with Q -> Q,s | F -> F,s | S p -> let r,s = q s in Reply<_>.map (fun q -> (p,q)) r,s
-  let inline (</>) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,s = p s in match r with Q | F -> q s | p -> p,s
+  let inline (</>) (p : Parser<_,_,_>) (q : Parser<_,_,_>) s = let r,ps = p s in match r with Q | F -> q s | p -> p,ps
 
   let inline manyMax     n (p : Parser<_,_,_>) s =
     let b = ref    Δ
