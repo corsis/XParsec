@@ -80,7 +80,7 @@ S (L [I 1; L [I 2]; I 3])
 # License
 
 ```
-Copyright (c) 2012, Cetin Sert
+XParsec™ - © 2012 – 2016 Cetin Sert
 
 All rights reserved.
 
