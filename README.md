@@ -1,10 +1,25 @@
 ```
-Version 2 of this library is being built
+Version 2 of this library is being built as part of a larger fundraising project.
 ```
 
 ---
 
-[x] ok
+- [x] Drop .fsi for faster iterations
+- [x] Rename primitives for clarity
+- [ ] Comprehensive documentation
+- [x] Generalized parser negation `-`
+- [x] Steps in `uint64` instead of `int` (to be used with very large data sets)
+- [x] XParsec.fs (primitives; operators; combinators)
+- [x] XParsec.Array.fs [parse any 1D source]
+- [x] XParsec.Xml.Linq.fs [parse System.Xml.Linq trees]
+- [ ] [XParsec.Fable.Html.fs](https://home.corsis.tech/fable.html) (click last link) [parse browser DOM trees]
+- [ ] [XParsec + PDF.js => tech demo](https://home.corsis.tech/) [parse PDF pages, PDF documents]
+
+---
+
+```
+Version 1
+```
 
 ---
 
