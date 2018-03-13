@@ -11,7 +11,8 @@ Version 2 of this library is being built as part of a larger fundraising project
 - [x] XParsec.Array.fs [parse any 1D source]
 - [x] XParsec.Xml.Linq.fs [parse System.Xml.Linq trees]
 - [ ] [XParsec.Fable.Html.fs](https://home.corsis.tech/fable.html) (click last link) [parse browser DOM trees]
-- [ ] [XParsec + PDF.js => tech demo](https://home.corsis.tech/) [parse PDF pages, PDF documents]
+- [ ] [XParsec + PDF.js (tech demo)](https://home.corsis.tech/) [parse PDF pages, PDF documents]
+      ![docpar]
 
 ---
 
@@ -136,9 +137,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Contact
 
-[![corsis]](https://github.com/corsis/)
+[![corsis]](https://github.com/corsis)
+[![cssign]](https://github.com/cetinsert)
 
 [xparsec@corsis.tech](mailto:xparsec@corsis.tech)
 
 [corsis]: https://home.corsis.tech/marketing/images/ipw/karamalz/corsis.png "Corsis Research"
-[cs]: https://home.corsis.tech/marketing/images/ipw/karamalz/sig.100.tr.png "Cetin Sert" 
+[cssign]: https://home.corsis.tech/marketing/images/ipw/karamalz/sig.100.tr.png "Cetin Sert"
+[docpar]: https://home.corsis.tech/marketing/images/ipw/hansol/cofs1.png "Document Parsing"
