@@ -2,8 +2,6 @@
 Version 2 of this library is being built as part of a larger fundraising project.
 ```
 
----
-
 - [x] Drop .fsi for faster iterations
 - [x] Rename primitives for clarity
 - [ ] Comprehensive documentation
@@ -18,10 +16,8 @@ Version 2 of this library is being built as part of a larger fundraising project
 ---
 
 ```
-Version 1
+Version 1 examples below.
 ```
-
----
 
 **XParsec** works with **[any type](https://github.com/corsis/XParsec/blob/master/XParsec.fsi#L26)**, is **[very easy to extend](https://github.com/corsis/XParsec/blob/master/XParsec.fs#L81)**, supports **[domain-specific non-linear navigation](https://github.com/corsis/XParsec/blob/master/XParsec.fs#L122)** and is **[implemented in a single F# file with just ~100 source lines of code](https://github.com/corsis/XParsec/blob/master/XParsec.fs)**.
 
@@ -105,7 +101,7 @@ S (L [I 1; L [I 2]; I 3])
 # License
 
 ```
-XParsec™ © 2012 – 2016 Cetin Sert
+XParsec™ © 2012 – 2018 Cetin Sert
 
 All rights reserved.
 
@@ -144,4 +140,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [xparsec@corsis.tech](mailto:xparsec@corsis.tech)
 
-[corsis]: http://portfusion.sourceforge.net/i/l100.png "Corsis Research"
+[corsis]: https://home.corsis.tech/marketing/images/ipw/karamalz/corsis.png "Corsis Research"
