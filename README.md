@@ -141,3 +141,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 [xparsec@corsis.tech](mailto:xparsec@corsis.tech)
 
 [corsis]: https://home.corsis.tech/marketing/images/ipw/karamalz/corsis.png "Corsis Research"
+[cs]: https://home.corsis.tech/marketing/images/ipw/karamalz/sig.100.tr.png "Cetin Sert" 
