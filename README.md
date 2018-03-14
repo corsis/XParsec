@@ -2,7 +2,6 @@
 Version 2 of this library is being built as part of a larger fundraising project.
 ```
 
-- [x] Drop .fsi for faster iterations
 - [x] Rename primitives for clarity
 - [ ] Comprehensive documentation
 - [x] Generalized parser negation `-`
